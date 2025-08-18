@@ -3,12 +3,16 @@ import "./globals.css";
 import { AppContextProvider } from "@/context/AppContext";
 import { Toaster } from "react-hot-toast";
 import { ClerkProvider } from "@clerk/nextjs";
+import { assets } from "@/assets/assets";
 
 const outfit = Outfit({ subsets: ['latin'], weight: ["300", "400", "500"] })
 
 export const metadata = {
-  title: "QuickCart - GreatStack",
-  description: "E-Commerce with Next.js ",
+  title: "Tech Space",
+  description: "E-Commerce website of selling technology products",
+  icons: {
+    icon: "/logo_no_text.svg",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -22,6 +26,6 @@ export default function RootLayout({ children }) {
           </AppContextProvider>
         </body>
       </html>
-      </ClerkProvider>
+    </ClerkProvider>
   );
 }
