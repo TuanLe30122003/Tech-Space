@@ -22,7 +22,11 @@ export default function RootLayout({ children }) {
         <body className={`${outfit.className} antialiased text-gray-700`} >
           <Toaster />
           <AppContextProvider>
-            {children}
+            <div className="w-full flex flex-col items-center justify-center">
+              <div className="w-full max-w-[1440px] flex flex-col items-center justify-center">
+                {children}
+              </div>
+            </div>
           </AppContextProvider>
         </body>
       </html>

@@ -48,6 +48,15 @@ import product_details_page_apple_earphone_image3 from "./product_details_page_a
 import product_details_page_apple_earphone_image4 from "./product_details_page_apple_earphone_image4.png";
 import product_details_page_apple_earphone_image5 from "./product_details_page_apple_earphone_image5.png";
 
+// new import 
+
+import feature_product_1 from './feature_product_1.png'
+import feature_product_2 from './feature_product_2.png'
+import feature_product_3 from './feature_product_3.png'
+import feature_product_4 from './feature_product_4.png'
+import feature_product_5 from './feature_product_5.png'
+
+
 export const assets = {
   logo,
   logoNoText,
@@ -97,7 +106,13 @@ export const assets = {
   product_details_page_apple_earphone_image3,
   product_details_page_apple_earphone_image4,
   product_details_page_apple_earphone_image5,
-  checkmark
+  checkmark,
+
+  feature_product_1,
+  feature_product_2,
+  feature_product_3,
+  feature_product_4,
+  feature_product_5
 };
 
 export const BagIcon = () => {
