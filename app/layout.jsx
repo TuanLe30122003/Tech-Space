@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
           <Toaster />
           <AppContextProvider>
             <div className="w-full flex flex-col items-center justify-center">
-              <div className="w-full max-w-[1440px] flex flex-col items-center justify-center">
+              <div className="w-full max-w-[1440px] bg-red flex flex-col items-center justify-center">
                 {children}
               </div>
             </div>

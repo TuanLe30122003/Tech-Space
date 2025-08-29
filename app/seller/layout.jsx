@@ -1,18 +1,18 @@
-'use client'
-import Navbar from '@/components/seller/Navbar'
-import Sidebar from '@/components/seller/Sidebar'
-import React from 'react'
+"use client";
+import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/seller/Sidebar";
+import React from "react";
 
 const Layout = ({ children }) => {
   return (
-    <div>
+    <div className="w-full">
       <Navbar />
-      <div className='flex w-full'>
+      <div className="flex w-full px-32">
         <Sidebar />
         {children}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;
