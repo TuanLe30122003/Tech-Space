@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 const AgentDrawer = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([
@@ -40,6 +40,69 @@ const AgentDrawer = ({ isOpen, onClose }) => {
   ]);
 
   const [inputMessage, setInputMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const abortRef = useRef(null);
+
+  const handleSend = async () => {
+    const text = inputMessage.trim();
+    if (!text || loading) return;
+
+    // 1) append user message
+    const userMsg = {
+      id: Date.now(),
+      type: "user",
+      content: text,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, userMsg]);
+    setInputMessage("");
+    setLoading(true);
+
+    // 2) call your Next.js API route
+    try {
+      // nếu muốn có khả năng hủy
+      abortRef.current = new AbortController();
+      const res = await fetch("/api/gemini-ai-model", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }), // server của bạn đọc data.text
+        signal: abortRef.current.signal,
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `Request failed with ${res.status}`);
+      }
+
+      const data = await res.json();
+      const botText = data.summary ?? "Sorry, I couldn't generate a response.";
+
+      // 3) append agent message
+      const agentMsg = {
+        id: Date.now() + 1,
+        type: "agent",
+        content: botText,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, agentMsg]);
+    } catch (err) {
+      const agentErr = {
+        id: Date.now() + 2,
+        type: "agent",
+        content: `⚠️ Error: ${err.message || "Something went wrong."}`,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, agentErr]);
+    } finally {
+      setLoading(false);
+      abortRef.current = null;
+    }
+  };
+
+  const handleCancel = () => {
+    if (abortRef.current) abortRef.current.abort();
+  };
+
   return (
     <>
       {/* Overlay */}
@@ -76,27 +139,33 @@ const AgentDrawer = ({ isOpen, onClose }) => {
 
         {/* Body */}
         <div className="flex-1 flex flex-col">
-          {/* Chat Messages */}
           <div className="flex-1 p-4 overflow-y-auto">
             <div className="space-y-4">
-              {messages.map((message) => (
+              {messages.map((m) => (
                 <div
-                  key={message.id}
+                  key={m.id}
                   className={`flex ${
-                    message.type === "user" ? "justify-end" : "justify-start"
+                    m.type === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
                     className={`rounded-lg px-4 py-2 max-w-xs ${
-                      message.type === "user"
+                      m.type === "user"
                         ? "bg-gray-200 text-gray-800"
                         : "bg-blue-100 text-blue-800"
                     }`}
                   >
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">{m.content}</p>
                   </div>
                 </div>
               ))}
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="rounded-lg px-4 py-2 max-w-xs bg-blue-50 text-blue-700 text-sm italic">
+                    typing…
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -109,37 +178,38 @@ const AgentDrawer = ({ isOpen, onClose }) => {
                 placeholder="Ask me anything about technology..."
                 className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={3}
+                disabled={loading}
               />
-              <button
-                onClick={() => {
-                  if (inputMessage.trim()) {
-                    const newMessage = {
-                      id: messages.length + 1,
-                      type: "user",
-                      content: inputMessage.trim(),
-                      timestamp: new Date(),
-                    };
-                    setMessages([...messages, newMessage]);
-                    setInputMessage("");
-                  }
-                }}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSend}
+                  disabled={loading || !inputMessage.trim()}
+                  className="flex-1 bg-blue-500 disabled:opacity-60 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                  />
-                </svg>
-                Send Question
-              </button>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                    />
+                  </svg>
+                  {loading ? "Sending..." : "Send Question"}
+                </button>
+                {loading && (
+                  <button
+                    onClick={handleCancel}
+                    className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

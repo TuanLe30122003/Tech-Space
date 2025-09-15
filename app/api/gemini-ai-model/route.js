@@ -11,7 +11,6 @@ const model = genAI.getGenerativeModel({
     ],
 });
 
-
 /**
  * API route for generating content using Gemini AI model.
  */
@@ -30,9 +29,7 @@ export async function POST(req) {
     /**
      * Return the generated content as a JSON response.
      */
-    return new Response(
-        JSON.stringify({
-            summary: result.response.text(),
-        }),
-    );
+    return NextResponse.json({
+        summary: result.response.text(),
+    });
 }
