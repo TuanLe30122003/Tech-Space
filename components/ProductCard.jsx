@@ -2,13 +2,28 @@ import React from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
+import { Heart } from "lucide-react";
+import toast from "react-hot-toast";
 
 export function formatPrice(price) {
   return price.toLocaleString();
 }
 
-const ProductCard = ({ product }) => {
-  const { currency, router } = useAppContext();
+const ProductCard = ({ product, showWishlistButton = true }) => {
+  const { currency, router, user, toggleWishlist, isInWishlist } =
+    useAppContext();
+
+  const handleWishlistClick = (e) => {
+    e.stopPropagation(); // Ngăn chặn event bubbling đến parent div
+
+    if (!user) {
+      toast.error("Please login to add to wishlist");
+      return;
+    }
+
+    const isAdded = toggleWishlist(product._id);
+    toast.success(isAdded ? "Added to wishlist" : "Removed from wishlist");
+  };
 
   return (
     <div
@@ -16,7 +31,7 @@ const ProductCard = ({ product }) => {
         router.push("/product/" + product._id);
         scrollTo(0, 0);
       }}
-      className="flex flex-col items-start gap-0.5 max-w-[200px] w-full cursor-pointer"
+      className="relative flex flex-1 flex-col items-start gap-0.5 max-w-[200px] w-full cursor-pointer"
     >
       <div className="cursor-pointer group relative bg-gray-500/10 rounded-lg w-full h-52 flex items-center justify-center">
         <Image
@@ -26,9 +41,25 @@ const ProductCard = ({ product }) => {
           width={800}
           height={800}
         />
-        <button className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md">
-          <Image className="h-3 w-3" src={assets.heart_icon} alt="heart_icon" />
-        </button>
+        {showWishlistButton && (
+          <button
+            onClick={handleWishlistClick}
+            className="absolute top-[-10px] right-[-10px] bg-white p-2 rounded-full shadow-md hover:bg-red-50 transition"
+            title={
+              isInWishlist(product._id)
+                ? "Remove from wishlist"
+                : "Add to wishlist"
+            }
+          >
+            <Heart
+              className={`h-3 w-3 ${
+                isInWishlist(product._id)
+                  ? "text-red-500 fill-red-500"
+                  : "text-gray-400"
+              }`}
+            />
+          </button>
+        )}
       </div>
 
       <p className="md:text-base font-medium my-1 w-full truncate">

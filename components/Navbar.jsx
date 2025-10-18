@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
 import { useClerk, UserButton } from "@clerk/nextjs";
+import { Heart } from "lucide-react";
 
 const Navbar = () => {
-  const { isSeller, router, user } = useAppContext();
+  const { isSeller, router, user, getWishlistCount } = useAppContext();
   const { openSignIn } = useClerk();
 
   return (
@@ -43,6 +44,18 @@ const Navbar = () => {
       </div>
 
       <ul className="hidden md:flex items-center gap-4 ">
+        <div className="relative">
+          <Heart
+            className="w-4 h-4 cursor-pointer hover:text-red-500 transition"
+            onClick={() => router.push("/wishlist")}
+          />
+          {getWishlistCount() > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {getWishlistCount()}
+            </span>
+          )}
+        </div>
+
         <Image className="w-4 h-4" src={assets.search_icon} alt="search icon" />
         {user ? (
           <>

@@ -10,11 +10,21 @@ import Loading from "@/components/Loading";
 import { useAppContext } from "@/context/AppContext";
 import React from "react";
 import { formatPrice } from "@/components/ProductCard";
+import { Heart } from "lucide-react";
+import toast from "react-hot-toast";
 
 const Product = () => {
   const { id } = useParams();
 
-  const { products, router, addToCart, user, currency } = useAppContext();
+  const {
+    products,
+    router,
+    addToCart,
+    user,
+    currency,
+    toggleWishlist,
+    isInWishlist,
+  } = useAppContext();
 
   const [mainImage, setMainImage] = useState(null);
   const [productData, setProductData] = useState(null);
@@ -22,6 +32,16 @@ const Product = () => {
   const fetchProductData = async () => {
     const product = products.find((product) => product._id === id);
     setProductData(product);
+  };
+
+  const handleToggleWishlist = () => {
+    if (!user) {
+      toast.error("Please login to add to wishlist");
+      return;
+    }
+
+    const isAdded = toggleWishlist(productData._id);
+    toast.success(isAdded ? "Added to wishlist" : "Removed from wishlist");
   };
 
   useEffect(() => {
@@ -141,6 +161,29 @@ const Product = () => {
                 className="w-full py-3.5 bg-orange-500 text-white hover:bg-orange-600 transition"
               >
                 Buy now
+              </button>
+            </div>
+
+            {/* Wishlist Button */}
+            <div className="mt-6">
+              <button
+                onClick={handleToggleWishlist}
+                className={`w-full py-3.5 border-2 transition flex items-center justify-center gap-2 ${
+                  isInWishlist(productData._id)
+                    ? "border-red-500 text-red-500 bg-red-50 hover:bg-red-100"
+                    : "border-gray-300 text-gray-600 hover:border-gray-400 hover:bg-gray-50"
+                }`}
+              >
+                <Heart
+                  className={`w-5 h-5 ${
+                    isInWishlist(productData._id)
+                      ? "fill-red-500 text-red-500"
+                      : "text-gray-600"
+                  }`}
+                />
+                {isInWishlist(productData._id)
+                  ? "Remove from Wishlist"
+                  : "Add to Wishlist"}
               </button>
             </div>
           </div>
