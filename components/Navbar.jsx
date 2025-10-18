@@ -43,11 +43,8 @@ const Navbar = () => {
         )}
       </div>
 
-      <ul
-        className="hidden md:flex items-center gap-4 cursor-pointer"
-        onClick={() => router.push("/wishlist")}
-      >
-        <div className="relative">
+      <ul className="hidden md:flex items-center gap-4 cursor-pointer">
+        <div className="relative" onClick={() => router.push("/wishlist")}>
           <Heart className="w-4 h-4 cursor-pointer hover:text-red-500 transition" />
           {getWishlistCount() > 0 && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
