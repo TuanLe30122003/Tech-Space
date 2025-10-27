@@ -12,7 +12,7 @@ const Navbar = () => {
   const { openSignIn } = useClerk();
 
   return (
-    <nav className="flex w-full items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-b border-gray-300 text-gray-700">
+    <nav className="flex w-full items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-gray-300 text-gray-700">
       <Image
         className="cursor-pointer w-28 md:w-32"
         onClick={() => router.push("/")}
@@ -53,7 +53,12 @@ const Navbar = () => {
           )}
         </div>
 
-        <Image className="w-4 h-4" src={assets.search_icon} alt="search icon" />
+        <Image
+          className="w-4 h-4 cursor-pointer"
+          src={assets.search_icon}
+          alt="search icon"
+          onClick={() => router.push("/search")}
+        />
         {user ? (
           <>
             <UserButton>

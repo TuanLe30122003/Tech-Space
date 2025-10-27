@@ -23,6 +23,7 @@ export const AppContextProvider = (props) => {
   const [userData, setUserData] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [cartItems, setCartItems] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   // Wishlist store
   const {
@@ -39,6 +40,7 @@ export const AppContextProvider = (props) => {
 
   const fetchProductData = async () => {
     try {
+      setIsLoading(true);
       const { data } = await axios.get("/api/product/list");
 
       if (data.success) {
@@ -48,6 +50,8 @@ export const AppContextProvider = (props) => {
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -174,6 +178,7 @@ export const AppContextProvider = (props) => {
     fetchUserData,
     products,
     fetchProductData,
+    isLoading,
     cartItems,
     setCartItems,
     addToCart,

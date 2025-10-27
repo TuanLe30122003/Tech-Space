@@ -8,24 +8,11 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const MyOrders = () => {
-  const { currency, getToken, user } = useAppContext();
+  const { currency, getToken, user, products } = useAppContext();
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productsData, setProductsData] = useState({});
-
-  const fetchProductDetails = async (productId) => {
-    try {
-      const { data } = await axios.get(`/api/product/detail?id=${productId}`);
-      if (data.success) {
-        return data.product;
-      }
-      return null;
-    } catch (error) {
-      console.error(`Error fetching product ${productId}:`, error);
-      return null;
-    }
-  };
 
   const fetchOrders = async () => {
     try {
@@ -39,28 +26,15 @@ const MyOrders = () => {
         const ordersData = data.orders.reverse();
         setOrders(ordersData);
 
-        // Fetch product details for all items
-        const productIds = new Set();
+        // Get product details from context instead of API
+        const productsMap = {};
         ordersData.forEach((order) => {
           order.items.forEach((item) => {
-            productIds.add(item.product);
+            const product = products.find((p) => p._id === item.product);
+            if (product) {
+              productsMap[item.product] = product;
+            }
           });
-        });
-
-        // Fetch all product details
-        const productPromises = Array.from(productIds).map(
-          async (productId) => {
-            const product = await fetchProductDetails(productId);
-            return { productId, product };
-          }
-        );
-
-        const productResults = await Promise.all(productPromises);
-        const productsMap = {};
-        productResults.forEach(({ productId, product }) => {
-          if (product) {
-            productsMap[productId] = product;
-          }
         });
 
         setProductsData(productsMap);
@@ -74,10 +48,10 @@ const MyOrders = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && products.length > 0) {
       fetchOrders();
     }
-  }, [user]);
+  }, [user, products]);
 
   console.log(productsData);
   console.log(orders);
