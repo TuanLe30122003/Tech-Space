@@ -30,9 +30,9 @@ const MyOrders = () => {
         const productsMap = {};
         ordersData.forEach((order) => {
           order.items.forEach((item) => {
-            const product = products.find((p) => p._id === item.product);
+            const product = products.find((p) => p._id === item.product._id);
             if (product) {
-              productsMap[item.product] = product;
+              productsMap[item.product._id] = product;
             }
           });
         });
@@ -55,6 +55,7 @@ const MyOrders = () => {
 
   console.log(productsData);
   console.log(orders);
+  console.log(products);
 
   return (
     <div className="flex-1 w-full h-screen overflow-scroll flex flex-col justify-between text-sm">
@@ -71,11 +72,11 @@ const MyOrders = () => {
               >
                 <div className="flex-1 flex gap-5 max-w-80">
                   {order.items.length > 0 &&
-                  productsData[order.items[0].product] ? (
+                  productsData[order.items[0].product._id] ? (
                     <Image
                       className="max-w-16 max-h-16 object-cover rounded"
-                      src={productsData[order.items[0].product].image[0]}
-                      alt={productsData[order.items[0].product].name}
+                      src={productsData[order.items[0].product._id].image[0]}
+                      alt={productsData[order.items[0].product._id].name}
                       width={64}
                       height={64}
                     />
@@ -90,7 +91,7 @@ const MyOrders = () => {
                     <span className="font-medium text-base">
                       {order.items
                         .map((item) => {
-                          const product = productsData[item.product];
+                          const product = productsData[item.product._id];
                           const productName = product
                             ? product.name
                             : `Product ${item.product}`;
