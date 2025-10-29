@@ -6,6 +6,7 @@ import { useAppContext } from "@/context/AppContext";
 import Loading from "@/components/Loading";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { formatPrice } from "@/components/ProductCard";
 
 const MyOrders = () => {
   const { currency, getToken, user, products } = useAppContext();
@@ -116,8 +117,7 @@ const MyOrders = () => {
                   </p>
                 </div>
                 <p className="font-medium my-auto">
-                  {currency}
-                  {order.amount}
+                  {formatPrice(order.amount, currency)}
                 </p>
                 <div>
                   <p className="flex flex-col">

@@ -5,8 +5,9 @@ import { useAppContext } from "@/context/AppContext";
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 
-export function formatPrice(price) {
-  return price.toLocaleString();
+export function formatPrice(price, currency = "") {
+  const formattedPrice = price.toLocaleString();
+  return currency ? `${formattedPrice} ${currency}` : formattedPrice;
 }
 
 const ProductCard = ({ product, showWishlistButton = true }) => {
@@ -84,8 +85,7 @@ const ProductCard = ({ product, showWishlistButton = true }) => {
         </div>
       </div>
       <p className="text-base font-medium my-1">
-        {formatPrice(product.offerPrice)}
-        {currency}
+        {formatPrice(product.offerPrice, currency)}
       </p>
       <button className=" max-sm:hidden px-4 mt-1 py-1.5 text-gray-500 border border-gray-500/20 rounded-full text-xs hover:bg-slate-50 transition">
         Buy now

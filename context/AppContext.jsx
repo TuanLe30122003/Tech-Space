@@ -2,7 +2,7 @@
 import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useMemo } from "react";
 import toast from "react-hot-toast";
 import useWishlistStore from "@/store/wishlist";
 
@@ -25,7 +25,18 @@ export const AppContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  // Wishlist store
+  const categories = useMemo(() => {
+    if (!products || products.length === 0) return [];
+    const uniqueCategories = [
+      ...new Set(
+        products
+          .map((product) => product.category)
+          .filter((category) => category != null && category !== "")
+      ),
+    ];
+    return uniqueCategories.sort();
+  }, [products]);
+
   const {
     wishlistItems,
     addToWishlist,
@@ -153,7 +164,7 @@ export const AppContextProvider = (props) => {
 
   useEffect(() => {
     fetchProductData();
-    initializeFromSession(); // Khởi tạo wishlist từ sessionStorage
+    initializeFromSession();
   }, []);
 
   useEffect(() => {
@@ -162,7 +173,6 @@ export const AppContextProvider = (props) => {
     }
   }, [user]);
 
-  // Đồng bộ wishlist với sessionStorage khi có thay đổi
   useEffect(() => {
     syncWithSession();
   }, [wishlistItems]);
@@ -185,7 +195,7 @@ export const AppContextProvider = (props) => {
     updateCartQuantity,
     getCartCount,
     getCartAmount,
-    // Wishlist functions
+    categories,
     wishlistItems,
     addToWishlist,
     removeFromWishlist,

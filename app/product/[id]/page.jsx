@@ -119,11 +119,9 @@ const Product = () => {
             </div>
             <p className="text-gray-600 mt-3">{productData.description}</p>
             <p className="text-3xl font-medium mt-6">
-              {formatPrice(productData.offerPrice)}
-              {currency}
+              {formatPrice(productData.offerPrice, currency)}
               <span className="text-base font-normal text-gray-800/60 line-through ml-4">
-                {formatPrice(productData.price)}
-                {currency}
+                {formatPrice(productData.price, currency)}
               </span>
             </p>
             <hr className="bg-gray-600 my-6" />

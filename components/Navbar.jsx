@@ -1,15 +1,37 @@
 "use client";
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { assets, BagIcon, BoxIcon, CartIcon, HomeIcon } from "@/assets/assets";
 import Link from "next/link";
 import { useAppContext } from "@/context/AppContext";
 import Image from "next/image";
 import { useClerk, UserButton } from "@clerk/nextjs";
-import { Heart } from "lucide-react";
+import { ArrowDown, ChevronDown, Heart } from "lucide-react";
 
 const Navbar = () => {
-  const { isSeller, router, user, getWishlistCount } = useAppContext();
+  const { isSeller, router, user, getWishlistCount, products, categories } =
+    useAppContext();
   const { openSignIn } = useClerk();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Đóng dropdown khi click bên ngoài
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleCategoryClick = (category) => {
+    setIsDropdownOpen(false);
+    router.push(`/search?category=${encodeURIComponent(category)}`);
+  };
 
   return (
     <nav className="flex w-full items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-gray-300 text-gray-700">
@@ -26,6 +48,42 @@ const Navbar = () => {
         <Link href="/all-products" className="hover:text-gray-900 transition">
           Shop
         </Link>
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="hover:text-gray-900 transition flex flex-row items-center gap-1"
+          >
+            <span>Collections</span>
+            <ChevronDown
+              size={16}
+              className={`transition-transform duration-200 ${
+                isDropdownOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+          {isDropdownOpen && categories && categories.length > 0 && (
+            <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+              <div className="py-2">
+                {categories.map((category, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleCategoryClick(category)}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-150 text-sm text-gray-700 first:rounded-t-lg last:rounded-b-lg"
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {isDropdownOpen && (!categories || categories.length === 0) && (
+            <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+              <div className="py-2 px-4 text-sm text-gray-500">
+                No categories available
+              </div>
+            </div>
+          )}
+        </div>
         <Link href="/about" className="hover:text-gray-900 transition">
           About Us
         </Link>
