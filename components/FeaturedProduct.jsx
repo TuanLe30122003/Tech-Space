@@ -45,7 +45,7 @@ const FeaturedProduct = () => {
         <div className="w-28 h-0.5 bg-orange-600 mt-2"></div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-14 mt-12 md:px-14 px-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 mt-12 md:px-10 px-4">
         {products.map(({ id, image, title, description, category }) => (
           <div key={id} className="relative group rounded-lg overflow-hidden">
             <Image
@@ -55,7 +55,7 @@ const FeaturedProduct = () => {
             />
             <div className="group-hover:-translate-y-[-8px] transition duration-300 absolute top-8 left-8 text-black space-y-2">
               <p className="font-medium text-xl lg:text-2xl">{title}</p>
-              <p className="text-sm lg:text-base leading-5 max-w-60 line-clamp-4">
+              <p className="text-sm lg:text-base leading-5 max-w-60 line-clamp-2">
                 {description}
               </p>
               <button

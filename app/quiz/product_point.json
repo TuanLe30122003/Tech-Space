@@ -1,0 +1,186 @@
+{
+  "questions": [
+    {
+      "id": "primary-use",
+      "title": "What will you primarily use this device for?",
+      "description": "Choose the need you face most often when shopping for new tech.",
+      "options": [
+        {
+          "id": "primary-use-gaming",
+          "label": "Playing games and heavy entertainment",
+          "helperText": "Examples: console, gaming PC, high-spec laptop",
+          "points": 20
+        },
+        {
+          "id": "primary-use-creative",
+          "label": "Creative work and multimedia editing",
+          "helperText": "Examples: design, video editing, livestreaming",
+          "points": 18
+        },
+        {
+          "id": "primary-use-work",
+          "label": "Office work, studying, multitasking",
+          "helperText": "Examples: documents, online meetings, project tracking",
+          "points": 14
+        },
+        {
+          "id": "primary-use-portable",
+          "label": "Frequent travel, need a light and flexible device",
+          "helperText": "Examples: smartphone, tablet, wearable",
+          "points": 12
+        }
+      ]
+    },
+    {
+      "id": "budget",
+      "title": "Which budget range are you comfortable with?",
+      "description": "Pick the level of investment that feels right for you.",
+      "options": [
+        {
+          "id": "budget-low",
+          "label": "Under 10 million đ",
+          "helperText": "Entry-level devices, premium accessories",
+          "points": 10
+        },
+        {
+          "id": "budget-mid",
+          "label": "10 - 20 million đ",
+          "helperText": "Flagship smartphones, mid-range laptops",
+          "points": 14
+        },
+        {
+          "id": "budget-upper",
+          "label": "20 - 35 million đ",
+          "helperText": "Ultrabooks, tablets, enthusiast cameras",
+          "points": 18
+        },
+        {
+          "id": "budget-premium",
+          "label": "Above 35 million đ",
+          "helperText": "Workstation laptops, high-end PC/console",
+          "points": 22
+        }
+      ]
+    },
+    {
+      "id": "form-factor",
+      "title": "Which device type do you prefer?",
+      "description": "Pick the form factor that best fits your lifestyle.",
+      "options": [
+        {
+          "id": "form-laptop",
+          "label": "Laptop or Ultrabook",
+          "helperText": "Balance of mobility and performance",
+          "points": 16
+        },
+        {
+          "id": "form-desktop",
+          "label": "Console, desktop or large screen setup",
+          "helperText": "Powerful experience with high-end graphics",
+          "points": 20
+        },
+        {
+          "id": "form-mobile",
+          "label": "Smartphone or wearable",
+          "helperText": "Always with you, ready any time",
+          "points": 12
+        },
+        {
+          "id": "form-audio",
+          "label": "Audio gear or compact accessories",
+          "helperText": "Comfort-first, light entertainment",
+          "points": 10
+        }
+      ]
+    },
+    {
+      "id": "performance",
+      "title": "What performance level do you expect?",
+      "description": "Choose the overall performance target you want to hit.",
+      "options": [
+        {
+          "id": "performance-max",
+          "label": "Top-tier power",
+          "helperText": "Ready to invest for speed and strength",
+          "points": 20
+        },
+        {
+          "id": "performance-balance",
+          "label": "Balanced performance and cost",
+          "helperText": "Handles current needs with headroom for the future",
+          "points": 16
+        },
+        {
+          "id": "performance-essential",
+          "label": "Reliable everyday performance",
+          "helperText": "Smooth experience for daily tasks",
+          "points": 12
+        }
+      ]
+    },
+    {
+      "id": "experience",
+      "title": "Which experience excites you the most?",
+      "description": "Select what makes you happiest when using a device.",
+      "options": [
+        {
+          "id": "experience-graphics",
+          "label": "High-end visuals and AAA gaming",
+          "helperText": "High FPS, realistic graphics, VR/AR ready",
+          "points": 20
+        },
+        {
+          "id": "experience-creation",
+          "label": "Multitasking, coding, content creation",
+          "helperText": "Fast rendering and smooth workflows",
+          "points": 18
+        },
+        {
+          "id": "experience-mobility",
+          "label": "Portability and long battery life",
+          "helperText": "Work anywhere, always connected",
+          "points": 14
+        },
+        {
+          "id": "experience-entertainment",
+          "label": "Music, movies and relaxation",
+          "helperText": "Immersive sound and sharp visuals",
+          "points": 12
+        }
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "audio-wearable",
+      "title": "Audio Accessories & Personal Devices",
+      "description": "You value comfort, convenience and flexibility. Explore high-quality audio gear, premium wireless earbuds or smart wearables.",
+      "minScore": 0,
+      "maxScore": 70,
+      "matchCategories": ["audio", "earbud", "headphone", "accessory", "wearable"]
+    },
+    {
+      "id": "mobile-creator",
+      "title": "Smartphones & Advanced Wearables",
+      "description": "Portability and versatile workflows are important to you. Flagship smartphones, tablets or high-end smartwatches will serve you well.",
+      "minScore": 71,
+      "maxScore": 85,
+      "matchCategories": ["phone", "mobile", "tablet", "watch", "smartwatch"]
+    },
+    {
+      "id": "productivity",
+      "title": "Productive Laptops & Ultrabooks",
+      "description": "You need a flexible device that balances power with mobility. Consider modern office laptops, ultrabooks or 2-in-1 machines.",
+      "minScore": 86,
+      "maxScore": 95,
+      "matchCategories": ["laptop", "ultrabook", "notebook", "productivity"]
+    },
+    {
+      "id": "performance",
+      "title": "Gaming & High-Performance Gear",
+      "description": "You demand serious power for gaming or intensive graphics. Dive into gaming laptops, performance desktops or next-gen consoles.",
+      "minScore": 96,
+      "matchCategories": ["gaming", "console", "desktop", "workstation"]
+    }
+  ]
+}

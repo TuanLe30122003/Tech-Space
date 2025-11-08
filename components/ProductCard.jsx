@@ -6,8 +6,13 @@ import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 
 export function formatPrice(price, currency = "") {
-  const formattedPrice = price.toLocaleString();
-  return currency ? `${formattedPrice} ${currency}` : formattedPrice;
+  const numericValue =
+    typeof price === "number"
+      ? price
+      : Number(String(price).replace(/[^0-9.-]+/g, "")) || 0;
+  const formattedPrice = numericValue.toLocaleString("vi-VN");
+  const displayCurrency = currency || "đ";
+  return `${formattedPrice} ${displayCurrency}`.trim();
 }
 
 const ProductCard = ({ product, showWishlistButton = true }) => {

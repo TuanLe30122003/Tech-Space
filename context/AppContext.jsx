@@ -13,7 +13,11 @@ export const useAppContext = () => {
 };
 
 export const AppContextProvider = (props) => {
-  const currency = process.env.NEXT_PUBLIC_CURRENCY;
+  const envCurrency = process.env.NEXT_PUBLIC_CURRENCY;
+  const currency =
+    !envCurrency || envCurrency.trim().toLowerCase() === "usd"
+      ? "đ"
+      : envCurrency;
   const router = useRouter();
 
   const { user } = useUser();
