@@ -16,7 +16,7 @@ cloudinary.config({
 
 export async function POST(request) {
     try {
-        
+
         const { userId } = getAuth(request)
 
         const isSeller = await authSeller(userId)
@@ -32,6 +32,16 @@ export async function POST(request) {
         const category = formData.get('category');
         const price = formData.get('price');
         const offerPrice = formData.get('offerPrice');
+        const specificationsPayload = formData.get('specifications');
+        let specifications = {};
+
+        if (specificationsPayload) {
+            try {
+                specifications = JSON.parse(specificationsPayload);
+            } catch (parseError) {
+                return NextResponse.json({ success: false, message: 'invalid specifications payload' });
+            }
+        }
 
         const files = formData.getAll('images');
 
@@ -44,10 +54,10 @@ export async function POST(request) {
                 const arrayBuffer = await file.arrayBuffer()
                 const buffer = Buffer.from(arrayBuffer)
 
-                return new Promise((resolve,reject)=>{
+                return new Promise((resolve, reject) => {
                     const stream = cloudinary.uploader.upload_stream(
-                        {resource_type: 'auto'},
-                        (error,result) => {
+                        { resource_type: 'auto' },
+                        (error, result) => {
                             if (error) {
                                 reject(error)
                             } else {
@@ -68,9 +78,10 @@ export async function POST(request) {
             name,
             description,
             category,
-            price:Number(price),
-            offerPrice:Number(offerPrice),
+            price: Number(price),
+            offerPrice: Number(offerPrice),
             image,
+            specifications,
             date: Date.now()
         })
 
@@ -78,6 +89,6 @@ export async function POST(request) {
 
 
     } catch (error) {
-        NextResponse.json({ success: false, message: error.message })
+        return NextResponse.json({ success: false, message: error.message })
     }
 }

@@ -44,7 +44,7 @@ const HeaderSlider = () => {
   };
 
   return (
-    <div className="overflow-hidden relative w-full">
+    <div className="overflow-hidden relative w-full z-10">
       <div
         className="flex transition-transform duration-700 ease-in-out"
         style={{
@@ -67,7 +67,11 @@ const HeaderSlider = () => {
                 </button>
                 <button className="group flex items-center gap-2 px-6 py-2.5 font-medium">
                   {slide.buttonText2}
-                  <Image className="group-hover:translate-x-1 transition" src={assets.arrow_icon} alt="arrow_icon" />
+                  <Image
+                    className="group-hover:translate-x-1 transition"
+                    src={assets.arrow_icon}
+                    alt="arrow_icon"
+                  />
                 </button>
               </div>
             </div>

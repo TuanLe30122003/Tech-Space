@@ -8,9 +8,14 @@ const productSchema = new mongoose.Schema({
     offerPrice: { type: Number, required: true },
     image: { type: Array, required: true },
     category: { type: String, required: true },
+    specifications: { type: mongoose.Schema.Types.Mixed, default: {} },
     date: { type: Number, required: true }
 })
 
-const Product = mongoose.models.product || mongoose.model('product',productSchema)
+if (mongoose.models.product) {
+    mongoose.deleteModel('product');
+}
+
+const Product = mongoose.model('product', productSchema)
 
 export default Product
