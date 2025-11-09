@@ -348,7 +348,7 @@ const QuizPage = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-10">
+    <div className="mx-auto flex w-full flex-col gap-10">
       <div className="space-y-2">
         <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
           TechSpace Quiz
