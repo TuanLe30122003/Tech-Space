@@ -98,7 +98,7 @@ const OrderSummary = () => {
   }, [user]);
 
   return (
-    <div className="lg:w-[400px] w-full bg-gray-500/5 p-5 rounded-3xl">
+    <div className="lg:w-[360px] w-full bg-gray-500/5 p-5 rounded-3xl">
       <h2 className="text-xl md:text-2xl font-medium text-gray-700">
         Order Summary
       </h2>

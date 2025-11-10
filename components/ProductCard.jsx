@@ -12,7 +12,7 @@ export function formatPrice(price, currency = "") {
       : Number(String(price).replace(/[^0-9.-]+/g, "")) || 0;
   const formattedPrice = numericValue.toLocaleString("vi-VN");
   const displayCurrency = currency || "đ";
-  return `${formattedPrice} ${displayCurrency}`.trim();
+  return `${formattedPrice}${displayCurrency}`.trim();
 }
 
 const ProductCard = ({ product, showWishlistButton = true }) => {

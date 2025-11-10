@@ -54,7 +54,7 @@ const Cart = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b max-w-[1400px] mx-auto px-4">
+    <div className="bg-gradient-to-b mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
