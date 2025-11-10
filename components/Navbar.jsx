@@ -1,5 +1,11 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import { assets, BagIcon, BoxIcon, CartIcon, HomeIcon } from "@/assets/assets";
 import Link from "next/link";
 import { useAppContext } from "@/context/AppContext";
@@ -8,16 +14,26 @@ import { useClerk, UserButton } from "@clerk/nextjs";
 import { ArrowDown, ChevronDown, Heart } from "lucide-react";
 
 const Navbar = () => {
-  const { isSeller, router, user, getWishlistCount, products, categories } =
-    useAppContext();
+  const {
+    isSeller,
+    router,
+    user,
+    getWishlistCount,
+    products,
+    categories,
+    cartItems,
+    getCartCount,
+    getCartAmount,
+    currency,
+  } = useAppContext();
   const { openSignIn } = useClerk();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileCollectionsOpen, setIsMobileCollectionsOpen] = useState(false);
+  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
-
-  console.log(products);
+  const cartDrawerRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -30,6 +46,12 @@ const Navbar = () => {
       ) {
         setIsMobileMenuOpen(false);
         setIsMobileCollectionsOpen(false);
+      }
+      if (
+        cartDrawerRef.current &&
+        !cartDrawerRef.current.contains(event.target)
+      ) {
+        setIsCartDrawerOpen(false);
       }
     };
 
@@ -49,8 +71,57 @@ const Navbar = () => {
   const handleNavigation = (path) => {
     setIsMobileMenuOpen(false);
     setIsMobileCollectionsOpen(false);
+    setIsCartDrawerOpen(false);
     router.push(path);
   };
+
+  const cartSummary = useMemo(() => {
+    if (!cartItems || !products) return [];
+
+    return Object.entries(cartItems)
+      .filter(([, quantity]) => quantity > 0)
+      .map(([productId, quantity]) => {
+        const product = products.find((item) => item._id === productId);
+        if (!product) {
+          return null;
+        }
+        return {
+          id: productId,
+          name: product.name,
+          image: product.image?.[0] ?? assets.product_list_icon,
+          price: product.offerPrice ?? product.price ?? 0,
+          quantity,
+          total: (product.offerPrice ?? product.price ?? 0) * quantity,
+        };
+      })
+      .filter(Boolean);
+  }, [cartItems, products]);
+
+  const cartItemCount = typeof getCartCount === "function" ? getCartCount() : 0;
+  const cartTotalAmount =
+    typeof getCartAmount === "function" ? getCartAmount() : 0;
+  const resolvedCurrency = useMemo(() => {
+    if (!currency) return "USD";
+    if (currency === "đ") return "VND";
+    return currency.toUpperCase();
+  }, [currency]);
+
+  const formatPrice = useCallback(
+    (value) => {
+      const numericValue = Number(value);
+      if (Number.isNaN(numericValue)) return "";
+      try {
+        return new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: resolvedCurrency,
+          currencyDisplay: "symbol",
+        }).format(numericValue);
+      } catch (error) {
+        return `${currency || ""}${numericValue.toFixed(2)}`;
+      }
+    },
+    [currency, resolvedCurrency]
+  );
 
   return (
     <nav className="relative flex w-full items-center justify-between px-6 md:px-16 lg:px-32 py-3 border-gray-300 text-gray-700">
@@ -138,6 +209,105 @@ const Navbar = () => {
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
               {getWishlistCount()}
             </span>
+          )}
+        </div>
+        <div className="relative" ref={cartDrawerRef}>
+          <button
+            type="button"
+            onClick={() => setIsCartDrawerOpen((prev) => !prev)}
+            className="flex items-center justify-center rounded-full p-2 hover:border-gray-300 transition"
+            aria-label="Open cart drawer"
+          >
+            <CartIcon className="w-4 h-4 cursor-pointer hover:text-red-500 transition" />
+            {cartItemCount > 0 && (
+              <span className="absolute top-[1px] right-[-2px] bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {cartItemCount}
+              </span>
+            )}
+          </button>
+          {isCartDrawerOpen && (
+            <div className="absolute right-0 top-12 z-50 w-[26rem] max-w-[90vw] rounded-xl border border-gray-200 bg-white shadow-xl">
+              <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+                <p className="text-sm font-semibold text-gray-800">
+                  Your Cart ({cartItemCount})
+                </p>
+                <button
+                  type="button"
+                  className="text-xs text-gray-500 hover:text-gray-700 transition"
+                  onClick={() => setIsCartDrawerOpen(false)}
+                >
+                  Close
+                </button>
+              </div>
+              <div className="max-h-72 overflow-y-auto px-4 py-3 space-y-3">
+                {cartSummary.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-2 py-8 text-center text-sm text-gray-500">
+                    <Image
+                      src={assets.cart_icon}
+                      alt="Empty cart"
+                      className="h-8 w-8 opacity-60"
+                    />
+                    <span>Your cart is empty.</span>
+                    <button
+                      onClick={() => {
+                        setIsCartDrawerOpen(false);
+                        router.push("/all-products");
+                      }}
+                      className="rounded-full border border-orange-500 px-4 py-1 text-xs font-medium text-orange-500 transition hover:bg-orange-50"
+                    >
+                      Start shopping
+                    </button>
+                  </div>
+                ) : (
+                  cartSummary.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-start gap-4 rounded-lg border border-gray-100 p-3"
+                    >
+                      <div className="h-16 w-16 overflow-hidden rounded-md bg-gray-100">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          width={64}
+                          height={64}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-1 flex-col gap-1">
+                        <p className="text-sm font-medium text-gray-800 line-clamp-2">
+                          {item.name}
+                        </p>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>Quantity: {item.quantity}</span>
+                          <span>{formatPrice(item.price)}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm font-semibold text-gray-700">
+                          <span>Total</span>
+                          <span>{formatPrice(item.total)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              {cartSummary.length > 0 && (
+                <div className="border-t border-gray-100 px-4 py-3">
+                  <div className="flex items-center justify-between text-sm font-semibold text-gray-800">
+                    <span>Total</span>
+                    <span>{formatPrice(cartTotalAmount)}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsCartDrawerOpen(false);
+                      router.push("/cart");
+                    }}
+                    className="mt-3 w-full rounded-full bg-orange-600 py-2 text-sm font-medium text-white transition hover:bg-orange-700"
+                  >
+                    View cart & checkout
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 

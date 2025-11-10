@@ -98,7 +98,7 @@ const OrderSummary = () => {
   }, [user]);
 
   return (
-    <div className="w-full md:w-96 bg-gray-500/5 p-5">
+    <div className="lg:w-[400px] w-full bg-gray-500/5 p-5 rounded-3xl">
       <h2 className="text-xl md:text-2xl font-medium text-gray-700">
         Order Summary
       </h2>
@@ -110,7 +110,7 @@ const OrderSummary = () => {
           </label>
           <div className="relative inline-block w-full text-sm border">
             <button
-              className="peer w-full text-left px-4 pr-2 py-2 bg-white text-gray-700 focus:outline-none"
+              className="peer w-full text-left px-4 flex flex-row items-center justify-between pr-2 py-2 bg-white text-gray-700 focus:outline-none"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <span>

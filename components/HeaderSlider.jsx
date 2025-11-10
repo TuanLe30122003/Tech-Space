@@ -1,6 +1,8 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const HeaderSlider = () => {
   const sliderData = [
@@ -44,17 +46,27 @@ const HeaderSlider = () => {
   };
 
   return (
-    <div className="overflow-hidden relative w-full z-10">
-      <div
-        className="flex transition-transform duration-700 ease-in-out"
-        style={{
-          transform: `translateX(-${currentSlide * 100}%)`,
-        }}
+    <motion.div
+      className="overflow-hidden relative w-full z-10"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
+      <motion.div
+        className="flex"
+        animate={{ x: `-${currentSlide * 100}%` }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       >
         {sliderData.map((slide, index) => (
-          <div
+          <motion.div
             key={slide.id}
             className="flex flex-col-reverse md:flex-row items-center justify-between bg-[#E6E9F2] py-8 md:px-14 px-5 mt-6 rounded-xl min-w-full"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{
+              opacity: currentSlide === index ? 1 : 0.7,
+              scale: currentSlide === index ? 1 : 0.98,
+            }}
+            transition={{ duration: 0.4 }}
           >
             <div className="md:pl-8 mt-10 md:mt-0">
               <p className="md:text-base text-orange-600 pb-1">{slide.offer}</p>
@@ -82,11 +94,16 @@ const HeaderSlider = () => {
                 alt={`Slide ${index + 1}`}
               />
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
-      <div className="flex items-center justify-center gap-2 mt-8">
+      <motion.div
+        className="flex items-center justify-center gap-2 mt-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
+      >
         {sliderData.map((_, index) => (
           <div
             key={index}
@@ -96,8 +113,8 @@ const HeaderSlider = () => {
             }`}
           ></div>
         ))}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
