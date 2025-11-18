@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { ClerkProvider } from "@clerk/nextjs";
 import AgentToggle from "@/components/AgentModule/AgentToggle";
+import ChatbaseToggle from "@/components/chatbase/ChatbaseToggle";
 import { AppContextProvider } from "@/context/AppContext";
 
 const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500"] });
@@ -23,7 +24,6 @@ export default function RootLayout({ children }) {
           className={`${outfit.className} antialiased text-gray-700`}
           suppressHydrationWarning
         >
-          <AgentToggle />
           <Toaster />
           <AppContextProvider>
             <div className="w-full flex flex-col items-center justify-center">
@@ -31,6 +31,8 @@ export default function RootLayout({ children }) {
                 {children}
               </div>
             </div>
+            {/* <AgentToggle /> */}
+            <ChatbaseToggle />
           </AppContextProvider>
         </body>
       </html>
