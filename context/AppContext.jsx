@@ -2,7 +2,14 @@
 import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useState, useMemo } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+  useRef,
+} from "react";
 import toast from "react-hot-toast";
 import useWishlistStore from "@/store/wishlist";
 
@@ -28,6 +35,7 @@ export const AppContextProvider = (props) => {
   const [isSeller, setIsSeller] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const prevUserRef = useRef(null);
 
   const categories = useMemo(() => {
     if (!products || products.length === 0) return [];
@@ -172,6 +180,16 @@ export const AppContextProvider = (props) => {
   }, []);
 
   useEffect(() => {
+    // Chỉ xóa wishlist khi user chuyển từ đã đăng nhập sang đăng xuất
+    // Không xóa khi component mount lần đầu (prevUserRef.current === null)
+    if (prevUserRef.current !== null && prevUserRef.current && !user) {
+      // User đã đăng xuất
+      clearWishlist();
+    }
+
+    // Cập nhật ref với user hiện tại
+    prevUserRef.current = user;
+
     if (user) {
       fetchUserData();
     }
