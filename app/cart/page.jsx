@@ -166,7 +166,7 @@ const Cart = () => {
                             </button>
                           </div>
                           <p className="text-sm font-medium text-slate-600">
-                            Subtotal{" "}
+                            Subtotal{" : "}
                             <span className="text-slate-900">
                               {formatPrice(
                                 product.offerPrice * quantity,

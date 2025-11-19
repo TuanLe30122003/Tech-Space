@@ -127,6 +127,9 @@ const AddProduct = () => {
   return (
     <div className="flex-1 min-h-screen flex flex-col justify-between">
       <form onSubmit={handleSubmit} className="md:p-10 p-4 space-y-5 max-w-lg">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          Add <span className="text-orange-600">Product</span>
+        </h2>
         <div>
           <p className="text-base font-medium">Product Image</p>
           <div className="flex flex-wrap items-center gap-3 mt-2">

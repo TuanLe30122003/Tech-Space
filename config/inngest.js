@@ -31,7 +31,7 @@ export const syncUserUpdation = inngest.createFunction(
         id: 'update-user-from-clerk'
     },
     { event: 'clerk/user.updated' },
-    async ({event}) => {
+    async ({ event }) => {
         const { id, first_name, last_name, email_addresses, image_url } = event.data
         const userData = {
             _id: id,
@@ -40,7 +40,7 @@ export const syncUserUpdation = inngest.createFunction(
             imageUrl: image_url
         }
         await connectDB()
-        await User.findByIdAndUpdate(id,userData)
+        await User.findByIdAndUpdate(id, userData)
     }
 )
 
@@ -50,9 +50,9 @@ export const syncUserDeletion = inngest.createFunction(
         id: 'delete-user-with-clerk'
     },
     { event: 'clerk/user.deleted' },
-    async ({event}) => {
-        
-        const {id } = event.data
+    async ({ event }) => {
+
+        const { id } = event.data
 
         await connectDB()
         await User.findByIdAndDelete(id)
@@ -62,22 +62,24 @@ export const syncUserDeletion = inngest.createFunction(
 // Inngest Function to create user's order in database
 export const createUserOrder = inngest.createFunction(
     {
-        id:'create-user-order',
+        id: 'create-user-order',
         batchEvents: {
             maxSize: 5,
             timeout: '5s'
         }
     },
-    {event: 'order/created'},
-    async ({events}) => {
-        
-        const orders = events.map((event)=> {
+    { event: 'order/created' },
+    async ({ events }) => {
+
+        const orders = events.map((event) => {
             return {
                 userId: event.data.userId,
                 items: event.data.items,
                 amount: event.data.amount,
                 address: event.data.address,
-                date : event.data.date
+                date: event.data.date,
+                promotionCode: event.data.promotionCode || null,
+                discountAmount: event.data.discountAmount || 0
             }
         })
 

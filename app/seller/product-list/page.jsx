@@ -46,7 +46,9 @@ const ProductList = () => {
         <Loading />
       ) : (
         <div className="w-full md:p-10 p-4">
-          <h2 className="pb-4 text-lg font-medium">All Product</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            All <span className="text-orange-600">Products</span>
+          </h2>
           <div className="flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20">
             <table className=" table-fixed w-full overflow-hidden">
               <thead className="text-gray-900 text-sm text-left">

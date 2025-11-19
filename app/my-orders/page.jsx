@@ -30,10 +30,12 @@ const MyOrders = () => {
 
         const productsMap = {};
         ordersData.forEach((order) => {
-          order.items.forEach((item) => {
-            const product = products.find((p) => p._id === item.product._id);
-            if (product) {
-              productsMap[item.product._id] = product;
+          order.items?.forEach((item) => {
+            if (item?.product?._id) {
+              const product = products.find((p) => p._id === item.product._id);
+              if (product) {
+                productsMap[item.product._id] = product;
+              }
             }
           });
         });
@@ -61,7 +63,11 @@ const MyOrders = () => {
     }
     const totalItems = orders.reduce((total, order) => {
       return (
-        total + order.items.reduce((count, item) => count + item.quantity, 0)
+        total +
+        (order.items || []).reduce(
+          (count, item) => count + (item?.quantity || 0),
+          0
+        )
       );
     }, 0);
     return { totalOrders: orders.length, totalItems };
@@ -142,12 +148,14 @@ const MyOrders = () => {
             >
               {orders.map((order, index) => {
                 const firstProduct =
-                  order.items.length > 0
+                  order.items?.length > 0 && order.items[0]?.product?._id
                     ? productsData[order.items[0].product._id]
                     : null;
-                const orderDate = new Date(order.date).toLocaleDateString();
-                const totalItemCount = order.items.reduce(
-                  (count, item) => count + item.quantity,
+                const orderDate = order.date
+                  ? new Date(order.date).toLocaleDateString()
+                  : "N/A";
+                const totalItemCount = (order.items || []).reduce(
+                  (count, item) => count + (item?.quantity || 0),
                   0
                 );
                 return (
@@ -166,10 +174,10 @@ const MyOrders = () => {
                     <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                       <div className="flex flex-1 gap-4 md:gap-6">
                         <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 p-4 shadow-inner">
-                          {firstProduct ? (
+                          {firstProduct?.image?.[0] ? (
                             <Image
                               src={firstProduct.image[0]}
-                              alt={firstProduct.name}
+                              alt={firstProduct?.name || "Product"}
                               width={80}
                               height={80}
                               className="h-full w-full object-contain"
@@ -188,15 +196,16 @@ const MyOrders = () => {
                           <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
                             <h3 className="text-lg font-semibold text-slate-900 md:text-xl">
                               {order.items
-                                .map((item) => {
-                                  const product =
-                                    productsData[item.product._id];
+                                ?.map((item) => {
+                                  const product = item?.product?._id
+                                    ? productsData[item.product._id]
+                                    : null;
                                   const name = product
                                     ? product.name
-                                    : `Product`;
-                                  return `${name} x ${item.quantity}`;
+                                    : item?.product?.name || `Product`;
+                                  return `${name} x ${item?.quantity || 0}`;
                                 })
-                                .join(", ")}
+                                .join(", ") || "No items"}
                             </h3>
                           </div>
                           <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
@@ -205,7 +214,9 @@ const MyOrders = () => {
                               {totalItemCount === 1 ? "item" : "items"}
                             </span>
                             <span className="text-slate-400">•</span>
-                            <span>Order ID: {order._id.slice(-8)}</span>
+                            <span>
+                              Order ID: {order._id?.slice(-8) || "N/A"}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -216,12 +227,14 @@ const MyOrders = () => {
                             Shipping to
                           </p>
                           <p className="font-semibold text-slate-800">
-                            {order.address.fullName}
+                            {order.address?.fullName || "N/A"}
                           </p>
-                          <p>{order.address.area}</p>
-                          <p>{`${order.address.city}, ${order.address.state}`}</p>
+                          <p>{order.address?.area || "N/A"}</p>
+                          <p>{`${order.address?.city || "N/A"}, ${
+                            order.address?.state || "N/A"
+                          }`}</p>
                           <p className="text-xs text-slate-400">
-                            {order.address.phoneNumber}
+                            {order.address?.phoneNumber || "N/A"}
                           </p>
                         </div>
                         <div className="space-y-1 flex flex-col justify-between items-center gap-2">
@@ -229,7 +242,7 @@ const MyOrders = () => {
                             Payment summary
                           </p>
                           <p className="text-lg font-semibold text-slate-900">
-                            {formatPrice(order.amount, currency)}
+                            {formatPrice(order.amount || 0, currency)}
                           </p>
                           <p className="text-xs text-slate-500">
                             Method:{" "}
@@ -243,7 +256,7 @@ const MyOrders = () => {
                             Status
                           </p>
                           <p className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600 w-fit">
-                            Pending confirmation
+                            {order.status || "Pending confirmation"}
                           </p>
                           <p className="text-xs text-slate-500">
                             Placed on{" "}

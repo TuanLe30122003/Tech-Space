@@ -10,7 +10,7 @@ export async function POST(request) {
     try {
 
         const { userId } = getAuth(request)
-        const { address, items } = await request.json();
+        const { address, items, promotionCode, discountAmount = 0, finalAmount } = await request.json();
 
         if (!address || items.length === 0) {
             return NextResponse.json({ success: false, message: 'Invalid data' });
@@ -22,13 +22,20 @@ export async function POST(request) {
             return await acc + product.offerPrice * item.quantity;
         }, 0)
 
+        const tax = Math.floor(amount * 0.02);
+        const subtotal = amount + tax;
+        // Use finalAmount from client if provided, otherwise calculate
+        const orderAmount = finalAmount !== undefined ? finalAmount : (subtotal - discountAmount);
+
         await inngest.send({
             name: 'order/created',
             data: {
                 userId,
                 address,
                 items,
-                amount: amount + Math.floor(amount * 0.02),
+                amount: Math.max(0, orderAmount),
+                promotionCode: promotionCode || null,
+                discountAmount: discountAmount || 0,
                 date: Date.now()
             }
         })
