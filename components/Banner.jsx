@@ -22,7 +22,7 @@ const Banner = () => {
       >
         <Image
           className="max-w-56"
-          src={assets.jbl_soundbox_image}
+          src={assets.banner1}
           alt="jbl_soundbox_image"
         />
       </motion.div>
@@ -53,14 +53,14 @@ const Banner = () => {
         </motion.button>
       </motion.div>
       <motion.div
-        className="hidden md:block max-w-80"
+        className="hidden md:block max-w-80 mr-4"
         initial={{ opacity: 0, x: 40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <Image
           className="max-w-80"
-          src={assets.md_controller_image}
+          src={assets.banner2}
           alt="md_controller_image"
         />
       </motion.div>
@@ -72,7 +72,7 @@ const Banner = () => {
       >
         <Image
           className="md:hidden"
-          src={assets.sm_controller_image}
+          src={assets.banner2}
           alt="sm_controller_image"
         />
       </motion.div>

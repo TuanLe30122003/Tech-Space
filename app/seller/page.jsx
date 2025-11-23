@@ -5,64 +5,10 @@ import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
 import axios from "axios";
 import toast from "react-hot-toast";
-
-const specificationFields = {
-  Earphone: [
-    { key: "driverSize", label: "Driver Size" },
-    { key: "connectivity", label: "Connectivity" },
-    { key: "batteryLife", label: "Battery Life" },
-    { key: "weight", label: "Weight" },
-  ],
-  Headphone: [
-    { key: "driverSize", label: "Driver Size" },
-    { key: "connectivity", label: "Connectivity" },
-    { key: "batteryLife", label: "Battery Life" },
-    { key: "noiseCancellation", label: "Noise Cancellation" },
-  ],
-  Watch: [
-    { key: "display", label: "Display" },
-    { key: "batteryLife", label: "Battery Life" },
-    { key: "waterResistance", label: "Water Resistance" },
-    { key: "strapMaterial", label: "Strap Material" },
-  ],
-  Smartphone: [
-    { key: "display", label: "Display" },
-    { key: "processor", label: "Processor" },
-    { key: "ram", label: "RAM" },
-    { key: "storage", label: "Storage" },
-    { key: "batteryCapacity", label: "Battery Capacity" },
-    { key: "camera", label: "Camera" },
-  ],
-  Laptop: [
-    { key: "processor", label: "Processor" },
-    { key: "ram", label: "RAM" },
-    { key: "storage", label: "Storage" },
-    { key: "display", label: "Display" },
-    { key: "graphics", label: "Graphics" },
-    { key: "operatingSystem", label: "Operating System" },
-  ],
-  Camera: [
-    { key: "sensor", label: "Sensor" },
-    { key: "lensMount", label: "Lens Mount" },
-    { key: "megapixels", label: "Megapixels" },
-    { key: "isoRange", label: "ISO Range" },
-    { key: "videoResolution", label: "Video Resolution" },
-  ],
-  Accessories: [
-    { key: "compatibility", label: "Compatibility" },
-    { key: "material", label: "Material" },
-    { key: "dimensions", label: "Dimensions" },
-    { key: "weight", label: "Weight" },
-  ],
-};
-
-const createEmptySpecifications = (category) => {
-  const fields = specificationFields[category] || [];
-  return fields.reduce((acc, field) => {
-    acc[field.key] = "";
-    return acc;
-  }, {});
-};
+import {
+  specificationSchema,
+  createEmptySpecifications,
+} from "@/config/specificationSchema";
 
 const AddProduct = () => {
   const { getToken } = useAppContext();
@@ -77,10 +23,21 @@ const AddProduct = () => {
     createEmptySpecifications("Earphone")
   );
 
-  const handleSpecificationChange = (key, value) => {
+  const handleSpecificationChange = (key, value, fieldType) => {
+    let processedValue = value;
+
+    // Xử lý giá trị theo type
+    if (fieldType === "number") {
+      processedValue =
+        value === "" || value === null ? null : parseFloat(value);
+      if (isNaN(processedValue)) processedValue = null;
+    } else if (fieldType === "boolean") {
+      processedValue = Boolean(value);
+    }
+
     setSpecifications((prev) => ({
       ...prev,
-      [key]: value,
+      [key]: processedValue,
     }));
   };
 
@@ -245,30 +202,123 @@ const AddProduct = () => {
             />
           </div>
         </div>
-        {specificationFields[category] &&
-          specificationFields[category].length > 0 && (
-            <div className="flex flex-col gap-3 max-w-md">
+        {specificationSchema[category] &&
+          specificationSchema[category].length > 0 && (
+            <div className="flex flex-col gap-4 max-w-2xl">
               <p className="text-base font-medium">Specifications</p>
-              {specificationFields[category].map(({ key, label }) => (
-                <div key={key} className="flex flex-col gap-1">
-                  <label
-                    className="text-sm font-medium"
-                    htmlFor={`spec-${key}`}
-                  >
-                    {label}
-                  </label>
-                  <input
-                    id={`spec-${key}`}
-                    type="text"
-                    placeholder="Type here"
-                    className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-                    onChange={(e) =>
-                      handleSpecificationChange(key, e.target.value)
-                    }
-                    value={specifications[key] ?? ""}
-                  />
-                </div>
-              ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {specificationSchema[category].map((field) => (
+                  <div key={field.key} className="flex flex-col gap-1">
+                    <label
+                      className="text-sm font-medium"
+                      htmlFor={`spec-${field.key}`}
+                    >
+                      {field.label}
+                      {field.unit && (
+                        <span className="text-xs text-gray-500 ml-1">
+                          ({field.unit})
+                        </span>
+                      )}
+                    </label>
+                    {field.type === "select" ? (
+                      <select
+                        id={`spec-${field.key}`}
+                        className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
+                        onChange={(e) =>
+                          handleSpecificationChange(
+                            field.key,
+                            e.target.value,
+                            field.type
+                          )
+                        }
+                        value={specifications[field.key] ?? ""}
+                      >
+                        <option value="">Select {field.label}</option>
+                        {field.options.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    ) : field.type === "boolean" ? (
+                      <div className="flex items-center gap-3">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name={`spec-${field.key}`}
+                            checked={specifications[field.key] === true}
+                            onChange={() =>
+                              handleSpecificationChange(
+                                field.key,
+                                true,
+                                field.type
+                              )
+                            }
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm">Yes</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name={`spec-${field.key}`}
+                            checked={specifications[field.key] === false}
+                            onChange={() =>
+                              handleSpecificationChange(
+                                field.key,
+                                false,
+                                field.type
+                              )
+                            }
+                            className="w-4 h-4"
+                          />
+                          <span className="text-sm">No</span>
+                        </label>
+                      </div>
+                    ) : field.type === "number" ? (
+                      <div className="relative">
+                        <input
+                          id={`spec-${field.key}`}
+                          type="number"
+                          placeholder={field.placeholder || "0"}
+                          className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40 w-full"
+                          onChange={(e) =>
+                            handleSpecificationChange(
+                              field.key,
+                              e.target.value,
+                              field.type
+                            )
+                          }
+                          value={specifications[field.key] ?? ""}
+                          min={field.min}
+                          max={field.max}
+                          step={field.step || 1}
+                        />
+                        {field.unit && (
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+                            {field.unit}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <input
+                        id={`spec-${field.key}`}
+                        type="text"
+                        placeholder={field.placeholder || "Type here"}
+                        className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
+                        onChange={(e) =>
+                          handleSpecificationChange(
+                            field.key,
+                            e.target.value,
+                            field.type
+                          )
+                        }
+                        value={specifications[field.key] ?? ""}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         <button

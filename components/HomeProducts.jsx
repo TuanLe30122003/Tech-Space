@@ -1,11 +1,41 @@
 "use client";
 import React from "react";
-import ProductCard from "./ProductCard";
 import { useAppContext } from "@/context/AppContext";
 import { motion } from "framer-motion";
+import ProductSlider from "./ProductSlider";
+import Loading from "./Loading";
 
 const HomeProducts = () => {
-  const { products, router } = useAppContext();
+  const { products, router, isLoading } = useAppContext();
+
+  if (isLoading) {
+    return (
+      <motion.section
+        className="flex flex-col items-center pt-14"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <motion.div
+          className="flex flex-col items-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <p className="text-3xl font-medium">Popular products</p>
+          <motion.div
+            className="mt-2 h-0.5 w-28 bg-orange-600"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+          ></motion.div>
+        </motion.div>
+        <div className="mt-12 pb-14 w-full flex justify-center">
+          <Loading />
+        </div>
+      </motion.section>
+    );
+  }
 
   return (
     <motion.section
@@ -14,29 +44,22 @@ const HomeProducts = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <motion.p
-        className="text-2xl font-medium text-left w-full"
-        initial={{ opacity: 0, y: 16 }}
+      <motion.div
+        className="flex flex-col items-center"
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
       >
-        Popular products
-      </motion.p>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-col items-center gap-6 mt-6 pb-14 w-full">
-        {products.slice(0, 5).map((product, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.45,
-              delay: 0.12 * (index + 1),
-              ease: "easeOut",
-            }}
-          >
-            <ProductCard product={product} />
-          </motion.div>
-        ))}
+        <p className="text-3xl font-medium">Popular products</p>
+        <motion.div
+          className="mt-2 h-0.5 w-28 bg-orange-600"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+        ></motion.div>
+      </motion.div>
+      <div className="mt-12 pb-14 w-full">
+        <ProductSlider products={products} animationDelay={0.2} />
       </div>
       <motion.button
         onClick={() => {

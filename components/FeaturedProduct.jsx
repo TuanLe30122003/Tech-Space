@@ -1,8 +1,8 @@
 "use client";
 import React, { useMemo } from "react";
 import { useAppContext } from "@/context/AppContext";
-import ProductCard from "@/components/ProductCard";
 import { motion } from "framer-motion";
+import ProductSlider from "@/components/ProductSlider";
 
 const FeaturedProduct = () => {
   const { router, products, categories } = useAppContext();
@@ -44,7 +44,7 @@ const FeaturedProduct = () => {
         ></motion.div>
       </motion.div>
 
-      <div className="mt-12 space-y-14 px-4 md:px-10">
+      <div className="mt-12 space-y-14">
         {collections.length === 0 ? (
           <motion.div
             className="flex h-32 items-center justify-center rounded-lg border border-dashed border-gray-300 text-sm text-gray-500"
@@ -94,22 +94,10 @@ const FeaturedProduct = () => {
                   View all
                 </motion.button>
               </div>
-              <div className="grid w-full grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-                {items.map((product, index) => (
-                  <motion.div
-                    key={`${category}-${product._id}-${index}`}
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.45,
-                      delay: 0.2 + index * 0.08,
-                      ease: "easeOut",
-                    }}
-                  >
-                    <ProductCard product={product} />
-                  </motion.div>
-                ))}
-              </div>
+              <ProductSlider
+                products={items}
+                animationDelay={0.2 + collectionIndex * 0.1}
+              />
             </motion.section>
           ))
         )}

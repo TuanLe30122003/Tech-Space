@@ -47,6 +47,11 @@ import product_details_page_apple_earphone_image2 from "./product_details_page_a
 import product_details_page_apple_earphone_image3 from "./product_details_page_apple_earphone_image3.png";
 import product_details_page_apple_earphone_image4 from "./product_details_page_apple_earphone_image4.png";
 import product_details_page_apple_earphone_image5 from "./product_details_page_apple_earphone_image5.png";
+import header_slider_image1 from "./slider1.png";
+import header_slider_image2 from "./slider2.png";
+import header_slider_image3 from "./slider3.png";
+import banner1 from './banner1.png';
+import banner2 from './banner2.png';
 
 // new import 
 
@@ -112,7 +117,12 @@ export const assets = {
   feature_product_2,
   feature_product_3,
   feature_product_4,
-  feature_product_5
+  feature_product_5,
+  header_slider_image1,
+  header_slider_image2,
+  header_slider_image3,
+  banner1,
+  banner2,
 };
 
 export const BagIcon = () => {

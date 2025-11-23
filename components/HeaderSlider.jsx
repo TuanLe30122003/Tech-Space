@@ -3,32 +3,38 @@ import React, { useState, useEffect } from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useAppContext } from "@/context/AppContext";
 
 const HeaderSlider = () => {
+  const { router } = useAppContext();
+
   const sliderData = [
     {
       id: 1,
-      title: "Experience Pure Sound - Your Perfect Headphones Awaits!",
-      offer: "Limited Time Offer 30% Off",
-      buttonText1: "Buy now",
-      buttonText2: "Find more",
-      imgSrc: assets.header_headphone_image,
+      title: "MacBook Pro M5 - Superior Performance for Professional Work!",
+      offer: "Special Offer - 35% Off",
+      buttonText1: "Buy Now",
+      buttonText2: "Learn More",
+      imgSrc: assets.header_slider_image1,
+      category: "Laptop",
     },
     {
       id: 2,
-      title: "Next-Level Gaming Starts Here - Discover PlayStation 5 Today!",
-      offer: "Hurry up only few lefts!",
+      title: "Latest iPad - Unleash Your Creativity and Productivity!",
+      offer: "Limited Time Offer - 30% Off",
       buttonText1: "Shop Now",
       buttonText2: "Explore Deals",
-      imgSrc: assets.header_playstation_image,
+      imgSrc: assets.header_slider_image2,
+      category: "Tablet",
     },
     {
       id: 3,
-      title: "Power Meets Elegance - Apple MacBook Pro is Here for you!",
-      offer: "Exclusive Deal 40% Off",
+      title: "Apple Watch - Your Health and Fitness Companion!",
+      offer: "Special Deal - 25% Off",
       buttonText1: "Order Now",
       buttonText2: "Learn More",
-      imgSrc: assets.header_macbook_image,
+      imgSrc: assets.header_slider_image3,
+      category: "Watch",
     },
   ];
 
@@ -43,6 +49,14 @@ const HeaderSlider = () => {
 
   const handleSlideChange = (index) => {
     setCurrentSlide(index);
+  };
+
+  const handleButton1Click = (category) => {
+    router.push(`/search?category=${encodeURIComponent(category)}`);
+  };
+
+  const handleButton2Click = (category) => {
+    router.push(`/search?category=${encodeURIComponent(category)}`);
   };
 
   return (
@@ -74,10 +88,16 @@ const HeaderSlider = () => {
                 {slide.title}
               </h1>
               <div className="flex items-center mt-4 md:mt-6 ">
-                <button className="md:px-10 px-7 md:py-2.5 py-2 bg-orange-600 rounded-full text-white font-medium">
+                <button
+                  onClick={() => handleButton1Click(slide.category)}
+                  className="md:px-10 px-7 md:py-2.5 py-2 bg-orange-600 rounded-full text-white font-medium hover:bg-orange-700 transition-colors cursor-pointer"
+                >
                   {slide.buttonText1}
                 </button>
-                <button className="group flex items-center gap-2 px-6 py-2.5 font-medium">
+                <button
+                  onClick={() => handleButton2Click(slide.category)}
+                  className="group flex items-center gap-2 px-6 py-2.5 font-medium hover:text-orange-600 transition-colors cursor-pointer"
+                >
                   {slide.buttonText2}
                   <Image
                     className="group-hover:translate-x-1 transition"
@@ -87,9 +107,9 @@ const HeaderSlider = () => {
                 </button>
               </div>
             </div>
-            <div className="flex items-center flex-1 justify-center">
+            <div className="flex items-center flex-1 justify-center md:w-80 w-48 aspect-square">
               <Image
-                className="md:w-72 w-48"
+                className="object-cover"
                 src={slide.imgSrc}
                 alt={`Slide ${index + 1}`}
               />

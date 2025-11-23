@@ -12,56 +12,10 @@ import React from "react";
 import { Heart, ShoppingCart, Zap } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-
-const SPECIFICATION_FIELDS = {
-  Earphone: [
-    { key: "driverSize", label: "Driver Size" },
-    { key: "connectivity", label: "Connectivity" },
-    { key: "batteryLife", label: "Battery Life" },
-    { key: "weight", label: "Weight" },
-  ],
-  Headphone: [
-    { key: "driverSize", label: "Driver Size" },
-    { key: "connectivity", label: "Connectivity" },
-    { key: "batteryLife", label: "Battery Life" },
-    { key: "noiseCancellation", label: "Noise Cancellation" },
-  ],
-  Watch: [
-    { key: "display", label: "Display" },
-    { key: "batteryLife", label: "Battery Life" },
-    { key: "waterResistance", label: "Water Resistance" },
-    { key: "strapMaterial", label: "Strap Material" },
-  ],
-  Smartphone: [
-    { key: "display", label: "Display" },
-    { key: "processor", label: "Processor" },
-    { key: "ram", label: "RAM" },
-    { key: "storage", label: "Storage" },
-    { key: "batteryCapacity", label: "Battery Capacity" },
-    { key: "camera", label: "Camera" },
-  ],
-  Laptop: [
-    { key: "processor", label: "Processor" },
-    { key: "ram", label: "RAM" },
-    { key: "storage", label: "Storage" },
-    { key: "display", label: "Display" },
-    { key: "graphics", label: "Graphics" },
-    { key: "operatingSystem", label: "Operating System" },
-  ],
-  Camera: [
-    { key: "sensor", label: "Sensor" },
-    { key: "lensMount", label: "Lens Mount" },
-    { key: "megapixels", label: "Megapixels" },
-    { key: "isoRange", label: "ISO Range" },
-    { key: "videoResolution", label: "Video Resolution" },
-  ],
-  Accessories: [
-    { key: "compatibility", label: "Compatibility" },
-    { key: "material", label: "Material" },
-    { key: "dimensions", label: "Dimensions" },
-    { key: "weight", label: "Weight" },
-  ],
-};
+import {
+  specificationSchema,
+  formatSpecificationValue,
+} from "@/config/specificationSchema";
 
 const Product = () => {
   const { id } = useParams();
@@ -111,11 +65,15 @@ const Product = () => {
 
   const specificationEntries = useMemo(() => {
     if (!productData) return [];
-    const fields = SPECIFICATION_FIELDS[productData.category] ?? [];
-    return fields.map((field) => ({
-      ...field,
-      value: productData.specifications?.[field.key] ?? "—",
-    }));
+    const fields = specificationSchema[productData.category] ?? [];
+    return fields.map((field) => {
+      const rawValue = productData.specifications?.[field.key];
+      return {
+        ...field,
+        rawValue,
+        value: formatSpecificationValue(field, rawValue),
+      };
+    });
   }, [productData]);
 
   const highlightSpecifications = useMemo(() => {
@@ -395,15 +353,41 @@ const Product = () => {
               Specs
             </span>
           </div>
-          <div className="mt-6 divide-y">
+          <div className="mt-6 divide-y divide-slate-100">
             {specificationEntries.length > 0 ? (
-              specificationEntries.map(({ key, label, value }) => (
+              specificationEntries.map(({ key, label, value, type, unit }) => (
                 <div
                   key={key}
-                  className="grid gap-4 py-4 text-sm md:grid-cols-[200px,1fr]"
+                  className="grid gap-4 py-4 text-sm md:grid-cols-[220px,1fr] hover:bg-slate-50/50 transition-colors"
                 >
-                  <p className="font-medium text-slate-600">{label}</p>
-                  <p className="text-slate-800">{value || "—"}</p>
+                  <div className="flex items-center">
+                    <p className="font-medium text-slate-600">{label}</p>
+                    {unit && type === "number" && (
+                      <span className="ml-2 text-xs text-slate-400">
+                        ({unit})
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center">
+                    {type === "boolean" ? (
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${
+                          value === "Yes"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-100 text-slate-600"
+                        }`}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            value === "Yes" ? "bg-emerald-500" : "bg-slate-400"
+                          }`}
+                        />
+                        {value}
+                      </span>
+                    ) : (
+                      <p className="text-slate-800 font-medium">{value}</p>
+                    )}
+                  </div>
                 </div>
               ))
             ) : (

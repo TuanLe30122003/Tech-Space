@@ -39,18 +39,18 @@ const ProductCard = ({ product, showWishlistButton = true }) => {
       }}
       className="relative flex flex-1 flex-col items-start gap-0.5 max-w-[200px] w-full cursor-pointer"
     >
-      <div className="cursor-pointer group relative bg-gray-500/10 rounded-lg w-full h-52 flex items-center justify-center">
+      <div className="cursor-pointer relative bg-gray-500/10 rounded-lg w-full h-52 flex items-center justify-center overflow-hidden">
         <Image
           src={product.image[0]}
           alt={product.name}
-          className="group-hover:scale-105 transition object-cover w-4/5 h-4/5 md:w-full md:h-full"
+          className="hover:scale-105 transition-transform duration-300 object-cover w-4/5 h-4/5 md:w-full md:h-full"
           width={800}
           height={800}
         />
         {showWishlistButton && (
           <button
             onClick={handleWishlistClick}
-            className="absolute top-[-10px] right-[-10px] bg-white p-2 rounded-full shadow-md hover:bg-red-50 transition"
+            className="absolute top-2 right-2 z-20 bg-white p-2 rounded-full shadow-lg hover:bg-red-50 transition hover:scale-110"
             title={
               isInWishlist(product._id)
                 ? "Remove from wishlist"
