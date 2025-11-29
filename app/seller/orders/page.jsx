@@ -16,6 +16,8 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productsData, setProductsData] = useState({});
+  const [updatingStatus, setUpdatingStatus] = useState({});
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const fetchSellerOrders = async () => {
     try {
@@ -74,6 +76,90 @@ const Orders = () => {
     }, 0);
     return { totalOrders: orders.length, totalItems };
   }, [orders]);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      setUpdatingStatus((prev) => ({ ...prev, [orderId]: true }));
+      setOpenDropdown(null); // Close dropdown when status changes
+      const token = await getToken();
+
+      const { data } = await axios.patch(
+        "/api/order/update-status",
+        { orderId, status: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (data.success) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId ? { ...order, status: newStatus } : order
+          )
+        );
+        toast.success("Order status updated successfully");
+      } else {
+        toast.error(data.message || "Failed to update order status");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || "Failed to update order status");
+    } finally {
+      setUpdatingStatus((prev) => ({ ...prev, [orderId]: false }));
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openDropdown && !event.target.closest(`[data-dropdown="${openDropdown}"]`)) {
+        setOpenDropdown(null);
+      }
+    };
+
+    if (openDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [openDropdown]);
+
+  const formatStatus = (status) => {
+    if (!status) return "Order Placed";
+    // Capitalize first letter of each word
+    return status
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
+  const normalizeStatus = (status) => {
+    if (!status) return "Order Placed";
+    // Normalize to match API expected format
+    const formatted = formatStatus(status);
+    // Map common variations to standard format
+    const statusMap = {
+      "Order Placed": "Order Placed",
+      "Arrived": "Arrived",
+      "Delivered": "Delivered",
+      "Cancelled": "Cancelled",
+    };
+    return statusMap[formatted] || formatted;
+  };
+
+  const getStatusColor = (status) => {
+    const normalizedStatus = status?.toLowerCase() || "";
+    switch (normalizedStatus) {
+      case "cancelled":
+        return "bg-red-50 text-red-600 border-red-200";
+      case "delivered":
+        return "bg-blue-50 text-blue-600 border-blue-200";
+      case "arrived":
+        return "bg-purple-50 text-purple-600 border-purple-200";
+      case "order placed":
+        return "bg-emerald-50 text-emerald-600 border-emerald-200";
+      default:
+        return "bg-slate-50 text-slate-600 border-slate-200";
+    }
+  };
 
   if (loading) {
     return (
@@ -255,14 +341,113 @@ const Orders = () => {
                             </span>
                           </p>
                         </div>
-                        <div className="space-y-1 flex flex-col justify-between items-center gap-2">
+                        <div className="space-y-2 flex flex-col justify-between items-center gap-2">
                           <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                             Status
                           </p>
-                          <p className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600 w-fit">
-                            {order.status || "Pending confirmation"}
-                          </p>
-                          <p className="text-xs text-slate-500">
+                          <div className="relative w-full" data-dropdown={order._id}>
+                            <button
+                              type="button"
+                              onClick={() => setOpenDropdown(openDropdown === order._id ? null : order._id)}
+                              disabled={updatingStatus[order._id]}
+                              className={`w-full rounded-full px-4 py-2 text-xs font-semibold border flex items-center justify-center gap-2 transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${getStatusColor(order.status)}`}
+                            >
+                              <span>{formatStatus(order.status || "Order Placed")}</span>
+                              {updatingStatus[order._id] ? (
+                                <svg
+                                  className="animate-spin h-3 w-3"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  ></path>
+                                </svg>
+                              ) : (
+                                <svg
+                                  className={`h-3 w-3 transition-transform ${openDropdown === order._id ? "rotate-180" : ""}`}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 9l-7 7-7-7"
+                                  />
+                                </svg>
+                              )}
+                            </button>
+
+                            <AnimatePresence>
+                              {openDropdown === order._id && !updatingStatus[order._id] && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-slate-200 shadow-lg z-10 overflow-hidden"
+                                >
+                                  {["Order Placed", "Arrived", "Delivered", "Cancelled"].map((status) => {
+                                    const isActive = normalizeStatus(order.status || "Order Placed") === status;
+                                    const isDelivered = normalizeStatus(order.status || "Order Placed") === "Delivered";
+                                    const isCancelledDisabled = status === "Cancelled" && isDelivered;
+                                    const isDisabled = isActive || isCancelledDisabled;
+                                    return (
+                                      <button
+                                        key={status}
+                                        type="button"
+                                        onClick={() => handleStatusChange(order._id, status)}
+                                        disabled={isDisabled}
+                                        className={`w-full px-4 py-2.5 text-xs font-medium text-left transition-colors ${
+                                          isActive
+                                            ? `bg-slate-50 ${getStatusColor(status)} cursor-default`
+                                            : isCancelledDisabled
+                                            ? "text-slate-400 cursor-not-allowed opacity-50"
+                                            : "hover:bg-slate-50 text-slate-700 cursor-pointer"
+                                        } ${
+                                          status === "Cancelled"
+                                            ? "border-t border-slate-100"
+                                            : ""
+                                        }`}
+                                        title={isCancelledDisabled ? "Cannot cancel a delivered order" : ""}
+                                      >
+                                        <div className="flex items-center justify-between">
+                                          <span>{status}</span>
+                                          {isActive && (
+                                            <svg
+                                              className="h-4 w-4"
+                                              fill="currentColor"
+                                              viewBox="0 0 20 20"
+                                            >
+                                              <path
+                                                fillRule="evenodd"
+                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                clipRule="evenodd"
+                                              />
+                                            </svg>
+                                          )}
+                                        </div>
+                                      </button>
+                                    );
+                                  })}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-1">
                             Placed on{" "}
                             <span className="font-medium">{orderDate}</span>
                           </p>

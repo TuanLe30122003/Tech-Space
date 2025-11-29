@@ -15,6 +15,7 @@ const MyOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [productsData, setProductsData] = useState({});
+  const [cancellingOrder, setCancellingOrder] = useState(null);
 
   const fetchOrders = async () => {
     try {
@@ -72,6 +73,66 @@ const MyOrders = () => {
     }, 0);
     return { totalOrders: orders.length, totalItems };
   }, [orders]);
+
+  const formatStatus = (status) => {
+    if (!status) return "Order Placed";
+    // Capitalize first letter of each word
+    return status
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
+  const getStatusColor = (status) => {
+    const normalizedStatus = status?.toLowerCase() || "";
+    switch (normalizedStatus) {
+      case "cancelled":
+        return "bg-red-50 text-red-600 border-red-200";
+      case "delivered":
+        return "bg-blue-50 text-blue-600 border-blue-200";
+      case "arrived":
+        return "bg-purple-50 text-purple-600 border-purple-200";
+      case "order placed":
+        return "bg-emerald-50 text-emerald-600 border-emerald-200";
+      default:
+        return "bg-slate-50 text-slate-600 border-slate-200";
+    }
+  };
+
+  const canCancelOrder = (status) => {
+    const normalizedStatus = status?.toLowerCase() || "";
+    return normalizedStatus !== "delivered" && normalizedStatus !== "cancelled";
+  };
+
+  const handleCancelOrder = async (orderId) => {
+    try {
+      setCancellingOrder(orderId);
+      const token = await getToken();
+
+      const { data } = await axios.patch(
+        "/api/order/cancel",
+        { orderId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (data.success) {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order._id === orderId ? { ...order, status: "Cancelled" } : order
+          )
+        );
+        toast.success("Order cancelled successfully");
+      } else {
+        toast.error(data.message || "Failed to cancel order");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || "Failed to cancel order");
+    } finally {
+      setCancellingOrder(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -251,13 +312,63 @@ const MyOrders = () => {
                             </span>
                           </p>
                         </div>
-                        <div className="space-y-1 flex flex-col justify-between items-center gap-2">
+                        <div className="space-y-2 flex flex-col justify-between items-center gap-2">
                           <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
                             Status
                           </p>
-                          <p className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600 w-fit">
-                            {order.status || "Pending confirmation"}
+                          <p className={`rounded-full px-4 py-1.5 text-xs font-semibold border w-fit ${getStatusColor(order.status)}`}>
+                            {formatStatus(order.status || "Order Placed")}
                           </p>
+                          {canCancelOrder(order.status) && (
+                            <button
+                              onClick={() => handleCancelOrder(order._id)}
+                              disabled={cancellingOrder === order._id}
+                              className="mt-1 px-4 py-1.5 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                            >
+                              {cancellingOrder === order._id ? (
+                                <>
+                                  <svg
+                                    className="animate-spin h-3 w-3"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                      className="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
+                                  </svg>
+                                  <span>Cancelling...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <svg
+                                    className="h-3 w-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M6 18L18 6M6 6l12 12"
+                                    />
+                                  </svg>
+                                  <span>Cancel Order</span>
+                                </>
+                              )}
+                            </button>
+                          )}
                           <p className="text-xs text-slate-500">
                             Placed on{" "}
                             <span className="font-medium">{orderDate}</span>
