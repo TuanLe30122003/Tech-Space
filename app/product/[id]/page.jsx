@@ -94,8 +94,8 @@ const Product = () => {
   };
 
   return productData ? (
-    <div className="bg-gradient-to-b max-w-[1400px] mx-auto">
-      <div className="flex w-full flex-col gap-16 pb-20 pt-16">
+    <div className="bg-gradient-to-b max-w-[1400px] mx-auto w-full">
+      <div className="flex w-full flex-col gap-16 pb-20 md:pt-16">
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
