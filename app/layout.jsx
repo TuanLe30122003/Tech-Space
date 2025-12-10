@@ -2,7 +2,6 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { ClerkProvider } from "@clerk/nextjs";
-import AgentToggle from "@/components/AgentModule/AgentToggle";
 import ChatbaseToggle from "@/components/chatbase/ChatbaseToggle";
 import { AppContextProvider } from "@/context/AppContext";
 

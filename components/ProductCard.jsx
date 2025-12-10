@@ -22,11 +22,6 @@ const ProductCard = ({ product, showWishlistButton = true }) => {
   const handleWishlistClick = (e) => {
     e.stopPropagation(); // Ngăn chặn event bubbling đến parent div
 
-    if (!user) {
-      toast.error("Please login to add to wishlist");
-      return;
-    }
-
     const isAdded = toggleWishlist(product._id);
     toast.success(isAdded ? "Added to wishlist" : "Removed from wishlist");
   };

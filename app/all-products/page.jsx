@@ -49,7 +49,7 @@ const AllProducts = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <motion.div
-        className="flex w-full flex-col items-end pt-12"
+        className="flex w-full flex-col items-start md:items-end pt-12"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}

@@ -18,11 +18,6 @@ const useWishlistStore = create(
                         wishlistItems: [...wishlistItems, productId]
                     })
 
-                    // Lưu vào sessionStorage
-                    if (typeof window !== 'undefined') {
-                        sessionStorage.setItem('wishlist', JSON.stringify([...wishlistItems, productId]))
-                    }
-
                     return true // Thêm thành công
                 }
                 return false // Đã có trong wishlist
@@ -33,11 +28,6 @@ const useWishlistStore = create(
                 const updatedWishlist = wishlistItems.filter(id => id !== productId)
 
                 set({ wishlistItems: updatedWishlist })
-
-                // Cập nhật sessionStorage
-                if (typeof window !== 'undefined') {
-                    sessionStorage.setItem('wishlist', JSON.stringify(updatedWishlist))
-                }
             },
 
             toggleWishlist: (productId) => {
@@ -64,35 +54,34 @@ const useWishlistStore = create(
 
             clearWishlist: () => {
                 set({ wishlistItems: [] })
-
-                // Xóa khỏi sessionStorage
-                if (typeof window !== 'undefined') {
-                    sessionStorage.removeItem('wishlist')
-                }
             },
 
-            // Khởi tạo từ sessionStorage khi load
+            // Khởi tạo từ localStorage khi load (backward compatibility)
             initializeFromSession: () => {
+                // Persist middleware đã tự động load, nhưng giữ lại để tương thích
+                // Có thể migrate từ sessionStorage cũ sang localStorage nếu cần
                 if (typeof window !== 'undefined') {
-                    const storedWishlist = sessionStorage.getItem('wishlist')
-                    if (storedWishlist) {
-                        try {
-                            const parsedWishlist = JSON.parse(storedWishlist)
-                            set({ wishlistItems: parsedWishlist })
-                        } catch (error) {
-                            console.error('Error parsing wishlist from sessionStorage:', error)
-                            sessionStorage.removeItem('wishlist')
+                    try {
+                        // Migrate từ sessionStorage cũ nếu có
+                        const oldSessionWishlist = sessionStorage.getItem('wishlist')
+                        if (oldSessionWishlist) {
+                            const parsedWishlist = JSON.parse(oldSessionWishlist)
+                            const { wishlistItems } = get()
+                            // Merge với wishlist hiện tại
+                            const merged = [...new Set([...wishlistItems, ...parsedWishlist])]
+                            set({ wishlistItems: merged })
+                            sessionStorage.removeItem('wishlist') // Xóa sessionStorage cũ
                         }
+                    } catch (error) {
+                        console.error('Error migrating wishlist from sessionStorage:', error)
                     }
                 }
             },
 
-            // Đồng bộ với sessionStorage
+            // Đồng bộ với localStorage (backward compatibility)
             syncWithSession: () => {
-                if (typeof window !== 'undefined') {
-                    const { wishlistItems } = get()
-                    sessionStorage.setItem('wishlist', JSON.stringify(wishlistItems))
-                }
+                // Persist middleware đã tự động sync, nhưng giữ lại để tương thích
+                // Không cần làm gì vì persist đã tự động xử lý
             }
         }),
         {
@@ -100,18 +89,18 @@ const useWishlistStore = create(
             storage: createJSONStorage(() => ({
                 getItem: (name) => {
                     if (typeof window !== 'undefined') {
-                        return sessionStorage.getItem(name)
+                        return localStorage.getItem(name)
                     }
                     return null
                 },
                 setItem: (name, value) => {
                     if (typeof window !== 'undefined') {
-                        sessionStorage.setItem(name, value)
+                        localStorage.setItem(name, value)
                     }
                 },
                 removeItem: (name) => {
                     if (typeof window !== 'undefined') {
-                        sessionStorage.removeItem(name)
+                        localStorage.removeItem(name)
                     }
                 }
             }))

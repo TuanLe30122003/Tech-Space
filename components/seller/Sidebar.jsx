@@ -14,13 +14,26 @@ const SideBar = () => {
       icon: assets.product_list_icon,
     },
     { name: "Orders", path: "/seller/orders", icon: assets.order_icon },
-    { name: "Promotions", path: "/seller/promotions", icon: assets.promotion_icon },
+    {
+      name: "Promotions",
+      path: "/seller/promotions",
+      icon: assets.promotion_icon,
+    },
+    {
+      name: "Promotion List",
+      path: "/seller/promotion-list",
+      icon: assets.promotion_icon,
+    },
   ];
 
   return (
     <div className="md:w-64 w-16 border-r min-h-screen text-base border-gray-300 py-2 flex flex-col relative">
       {menuItems.map((item) => {
-        const isActive = pathname === item.path;
+        // For exact match or sub-routes (except for /seller which should only match exactly)
+        const isActive =
+          item.path === "/seller"
+            ? pathname === item.path
+            : pathname === item.path || pathname.startsWith(item.path + "/");
 
         return (
           <Link href={item.path} key={item.name} passHref>

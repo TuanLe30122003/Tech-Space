@@ -121,7 +121,7 @@ const Cart = () => {
                             {product.description}
                           </p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left md:text-right">
                           <p className="text-base font-semibold text-slate-900 md:text-lg">
                             {formatPrice(product.offerPrice, currency)}
                           </p>
@@ -133,7 +133,7 @@ const Cart = () => {
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:justify-end">
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 shadow-sm">
                             <button

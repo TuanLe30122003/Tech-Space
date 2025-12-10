@@ -39,11 +39,6 @@ const Product = () => {
   };
 
   const handleToggleWishlist = () => {
-    if (!user) {
-      toast.error("Please login to add to wishlist");
-      return;
-    }
-
     const isAdded = toggleWishlist(productData._id);
     toast.success(isAdded ? "Added to wishlist" : "Removed from wishlist");
   };
@@ -260,13 +255,25 @@ const Product = () => {
                 </span>
               </motion.button>
               <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={user ? { scale: 1.01 } : {}}
+                whileTap={user ? { scale: 0.98 } : {}}
                 onClick={() => {
+                  if (!user) {
+                    toast.error("Please login to proceed with checkout", {
+                      icon: "⚠️",
+                    });
+                    return;
+                  }
                   addToCart(productData._id);
-                  router.push(user ? "/cart" : "");
+                  router.push("/cart");
                 }}
-                className="flex-1 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:from-orange-500 hover:to-orange-500"
+                disabled={!user}
+                className={`flex-1 rounded-xl px-6 py-4 text-sm font-semibold text-white shadow-lg transition ${
+                  user
+                    ? "bg-gradient-to-r from-orange-500 to-orange-600 shadow-orange-500/20 hover:from-orange-500 hover:to-orange-500 cursor-pointer"
+                    : "bg-gray-400 cursor-not-allowed opacity-60"
+                }`}
+                title={!user ? "Please login to buy now" : ""}
               >
                 <span className="flex items-center justify-center gap-2">
                   <Zap className="h-4 w-4" />

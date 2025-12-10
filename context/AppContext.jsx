@@ -37,6 +37,42 @@ export const AppContextProvider = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const prevUserRef = useRef(null);
 
+  const CART_STORAGE_KEY = "techspace_cart_items";
+
+  const saveCartToLocalStorage = (cartData) => {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
+      }
+    } catch (error) {
+      console.error("Error saving cart to localStorage:", error);
+    }
+  };
+
+  const loadCartFromLocalStorage = () => {
+    try {
+      if (typeof window !== "undefined") {
+        const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+        if (savedCart) {
+          return JSON.parse(savedCart);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading cart from localStorage:", error);
+    }
+    return {};
+  };
+
+  const clearCartFromLocalStorage = () => {
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(CART_STORAGE_KEY);
+      }
+    } catch (error) {
+      console.error("Error clearing cart from localStorage:", error);
+    }
+  };
+
   const categories = useMemo(() => {
     if (!products || products.length === 0) return [];
     const uniqueCategories = [
@@ -92,7 +128,36 @@ export const AppContextProvider = (props) => {
 
       if (data.success) {
         setUserData(data.user);
-        setCartItems(data.user.cartItems);
+
+        // Merge localStorage cart with server cart when user logs in
+        const localCart = loadCartFromLocalStorage();
+        const serverCart = data.user.cartItems || {};
+
+        // Merge carts: combine quantities for same items
+        const mergedCart = { ...serverCart };
+        for (const itemId in localCart) {
+          if (mergedCart[itemId]) {
+            mergedCart[itemId] += localCart[itemId];
+          } else {
+            mergedCart[itemId] = localCart[itemId];
+          }
+        }
+
+        setCartItems(mergedCart);
+
+        // Sync merged cart to server
+        try {
+          await axios.post(
+            "/api/cart/update",
+            { cartData: mergedCart },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        } catch (error) {
+          console.error("Error syncing merged cart:", error);
+        }
+
+        // Clear localStorage cart after merging
+        clearCartFromLocalStorage();
       } else {
         toast.error(data.message);
       }
@@ -102,12 +167,6 @@ export const AppContextProvider = (props) => {
   };
 
   const addToCart = async (itemId) => {
-    if (!user) {
-      return toast("Please login", {
-        icon: "⚠️",
-      });
-    }
-
     let cartData = structuredClone(cartItems);
     if (cartData[itemId]) {
       cartData[itemId] += 1;
@@ -115,7 +174,9 @@ export const AppContextProvider = (props) => {
       cartData[itemId] = 1;
     }
     setCartItems(cartData);
+
     if (user) {
+      // User is logged in - sync to server
       try {
         const token = await getToken();
         await axios.post(
@@ -127,6 +188,10 @@ export const AppContextProvider = (props) => {
       } catch (error) {
         toast.error(error.message);
       }
+    } else {
+      // User is not logged in - save to localStorage
+      saveCartToLocalStorage(cartData);
+      toast.success("Item added to cart");
     }
   };
 
@@ -138,7 +203,9 @@ export const AppContextProvider = (props) => {
       cartData[itemId] = quantity;
     }
     setCartItems(cartData);
+
     if (user) {
+      // User is logged in - sync to server
       try {
         const token = await getToken();
         await axios.post(
@@ -150,6 +217,9 @@ export const AppContextProvider = (props) => {
       } catch (error) {
         toast.error(error.message);
       }
+    } else {
+      // User is not logged in - save to localStorage
+      saveCartToLocalStorage(cartData);
     }
   };
 
@@ -177,6 +247,14 @@ export const AppContextProvider = (props) => {
   useEffect(() => {
     fetchProductData();
     initializeFromSession();
+
+    // Load cart from localStorage if user is not logged in
+    if (!user) {
+      const localCart = loadCartFromLocalStorage();
+      if (Object.keys(localCart).length > 0) {
+        setCartItems(localCart);
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -185,6 +263,13 @@ export const AppContextProvider = (props) => {
     if (prevUserRef.current !== null && prevUserRef.current && !user) {
       // User đã đăng xuất
       clearWishlist();
+      // Load cart from localStorage when user logs out
+      const localCart = loadCartFromLocalStorage();
+      if (Object.keys(localCart).length > 0) {
+        setCartItems(localCart);
+      } else {
+        setCartItems({});
+      }
     }
 
     // Cập nhật ref với user hiện tại
@@ -198,6 +283,13 @@ export const AppContextProvider = (props) => {
   useEffect(() => {
     syncWithSession();
   }, [wishlistItems]);
+
+  // Save cart to localStorage when cartItems change and user is not logged in
+  useEffect(() => {
+    if (!user && cartItems) {
+      saveCartToLocalStorage(cartItems);
+    }
+  }, [cartItems, user]);
 
   const value = {
     user,

@@ -128,7 +128,11 @@ const MyOrders = () => {
         toast.error(data.message || "Failed to cancel order");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || "Failed to cancel order");
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to cancel order"
+      );
     } finally {
       setCancellingOrder(null);
     }
@@ -144,28 +148,28 @@ const MyOrders = () => {
 
   return (
     <div className="w-full">
-      <div className="flex w-full flex-col gap-12 pb-20 pt-16">
+      <div className="flex w-full flex-col gap-8 md:gap-12 pb-20 pt-6 md:pt-16 px-0">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
-          className="flex flex-wrap items-center justify-between gap-4"
+          className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <div>
-            <h1 className="text-3xl font-semibold text-slate-900 md:text-4xl">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-900">
               My orders
             </h1>
-            <p className="mt-2 text-sm text-slate-500 md:text-base">
+            <p className="mt-2 text-xs md:text-sm lg:text-base text-slate-500">
               Track the status of your purchases and view order details all in
               one place.
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="rounded-xl md:rounded-2xl bg-slate-100 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-slate-700">
               {orderStats.totalOrders}{" "}
               {orderStats.totalOrders === 1 ? "order" : "orders"}
             </div>
-            <div className="rounded-2xl bg-orange-100 px-4 py-2 text-sm font-semibold text-orange-600">
+            <div className="rounded-xl md:rounded-2xl bg-orange-100 px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-orange-600">
               {orderStats.totalItems} items
             </div>
           </div>
@@ -230,11 +234,12 @@ const MyOrders = () => {
                       ease: "easeOut",
                       delay: index * 0.05,
                     }}
-                    className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
+                    className="rounded-2xl md:rounded-3xl border border-slate-200 bg-white p-4 md:p-6 shadow-sm"
                   >
-                    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                      <div className="flex flex-1 gap-4 md:gap-6">
-                        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 p-4 shadow-inner">
+                    <div className="flex flex-col gap-4 md:gap-6">
+                      {/* Product Info Section */}
+                      <div className="flex gap-3 md:gap-6">
+                        <div className="flex h-16 w-16 md:h-20 md:w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl md:rounded-2xl bg-slate-100 p-3 md:p-4 shadow-inner">
                           {firstProduct?.image?.[0] ? (
                             <Image
                               src={firstProduct.image[0]}
@@ -249,13 +254,13 @@ const MyOrders = () => {
                               alt="box icon"
                               width={48}
                               height={48}
-                              className="h-12 w-12 object-contain"
+                              className="h-8 w-8 md:h-12 md:w-12 object-contain"
                             />
                           )}
                         </div>
-                        <div className="space-y-3">
-                          <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
-                            <h3 className="text-lg font-semibold text-slate-900 md:text-xl">
+                        <div className="flex-1 min-w-0 space-y-2 md:space-y-3">
+                          <div className="flex flex-col gap-1.5 md:gap-2">
+                            <h3 className="text-sm md:text-lg lg:text-xl font-semibold text-slate-900 leading-tight line-clamp-2 md:line-clamp-none">
                               {order.items
                                 ?.map((item) => {
                                   const product = item?.product?._id
@@ -269,110 +274,135 @@ const MyOrders = () => {
                                 .join(", ") || "No items"}
                             </h3>
                           </div>
-                          <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-                            <span className="rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-600">
+                          <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm text-slate-500">
+                            <span className="rounded-full bg-slate-100 px-2.5 py-1 md:px-3 md:py-1 text-xs md:text-sm font-medium text-slate-600">
                               {totalItemCount}{" "}
                               {totalItemCount === 1 ? "item" : "items"}
                             </span>
-                            <span className="text-slate-400">•</span>
-                            <span>
+                            <span className="text-slate-400 hidden md:inline">
+                              •
+                            </span>
+                            <span className="text-xs md:text-sm break-all">
                               Order ID: {order._id?.slice(-8) || "N/A"}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="grid gap-4 text-sm text-slate-600 md:grid-cols-3 md:gap-6">
-                        <div className="space-y-1 flex flex-col justify-between items-center gap-2">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                      {/* Divider */}
+                      <div className="border-t border-slate-100"></div>
+
+                      {/* Details Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-sm text-slate-600">
+                        {/* Shipping Info */}
+                        <div className="space-y-1.5 md:space-y-1">
+                          <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2 md:mb-1">
                             Shipping to
                           </p>
-                          <p className="font-semibold text-slate-800">
-                            {order.address?.fullName || "N/A"}
-                          </p>
-                          <p>{order.address?.area || "N/A"}</p>
-                          <p>{`${order.address?.city || "N/A"}, ${
-                            order.address?.state || "N/A"
-                          }`}</p>
-                          <p className="text-xs text-slate-400">
-                            {order.address?.phoneNumber || "N/A"}
-                          </p>
+                          <div className="space-y-0.5 md:space-y-1">
+                            <p className="text-sm md:text-base font-semibold text-slate-800">
+                              {order.address?.fullName || "N/A"}
+                            </p>
+                            <p className="text-xs md:text-sm text-slate-600">
+                              {order.address?.area || "N/A"}
+                            </p>
+                            <p className="text-xs md:text-sm text-slate-600">
+                              {`${order.address?.city || "N/A"}, ${
+                                order.address?.state || "N/A"
+                              }`}
+                            </p>
+                            <p className="text-[10px] md:text-xs text-slate-400 mt-1">
+                              {order.address?.phoneNumber || "N/A"}
+                            </p>
+                          </div>
                         </div>
-                        <div className="space-y-1 flex flex-col justify-between items-center gap-2">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+
+                        {/* Payment Summary */}
+                        <div className="space-y-1.5 md:space-y-1">
+                          <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2 md:mb-1">
                             Payment summary
                           </p>
-                          <p className="text-lg font-semibold text-slate-900">
-                            {formatPrice(order.amount || 0, currency)}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            Method:{" "}
-                            <span className="font-medium">
-                              Cash on delivery
-                            </span>
-                          </p>
+                          <div className="space-y-0.5 md:space-y-1">
+                            <p className="text-base md:text-lg lg:text-xl font-semibold text-slate-900 break-words">
+                              {formatPrice(order.amount || 0, currency)}
+                            </p>
+                            <p className="text-[10px] md:text-xs text-slate-500">
+                              Method:{" "}
+                              <span className="font-medium">
+                                Cash on delivery
+                              </span>
+                            </p>
+                          </div>
                         </div>
-                        <div className="space-y-2 flex flex-col justify-between items-center gap-2">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+
+                        {/* Status */}
+                        <div className="space-y-2 md:space-y-2">
+                          <p className="text-[10px] md:text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2 md:mb-1">
                             Status
                           </p>
-                          <p className={`rounded-full px-4 py-1.5 text-xs font-semibold border w-fit ${getStatusColor(order.status)}`}>
-                            {formatStatus(order.status || "Order Placed")}
-                          </p>
-                          {canCancelOrder(order.status) && (
-                            <button
-                              onClick={() => handleCancelOrder(order._id)}
-                              disabled={cancellingOrder === order._id}
-                              className="mt-1 px-4 py-1.5 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-full hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
+                          <div className="space-y-2 md:space-y-2">
+                            <p
+                              className={`rounded-full px-3 py-1.5 md:px-4 md:py-1.5 text-[10px] md:text-xs font-semibold border w-fit ${getStatusColor(
+                                order.status
+                              )}`}
                             >
-                              {cancellingOrder === order._id ? (
-                                <>
-                                  <svg
-                                    className="animate-spin h-3 w-3"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <circle
-                                      className="opacity-25"
-                                      cx="12"
-                                      cy="12"
-                                      r="10"
+                              {formatStatus(order.status || "Order Placed")}
+                            </p>
+                            {canCancelOrder(order.status) && (
+                              <button
+                                onClick={() => handleCancelOrder(order._id)}
+                                disabled={cancellingOrder === order._id}
+                                className="mt-1 px-3 py-2 md:px-4 md:py-1.5 text-[10px] md:text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-full hover:bg-red-100 active:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 min-h-[36px] md:min-h-0"
+                              >
+                                {cancellingOrder === order._id ? (
+                                  <>
+                                    <svg
+                                      className="animate-spin h-3 w-3 md:h-3 md:w-3"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                      ></circle>
+                                      <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                      ></path>
+                                    </svg>
+                                    <span>Cancelling...</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <svg
+                                      className="h-3 w-3 md:h-3 md:w-3"
+                                      fill="none"
                                       stroke="currentColor"
-                                      strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                      className="opacity-75"
-                                      fill="currentColor"
-                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                    ></path>
-                                  </svg>
-                                  <span>Cancelling...</span>
-                                </>
-                              ) : (
-                                <>
-                                  <svg
-                                    className="h-3 w-3"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M6 18L18 6M6 6l12 12"
-                                    />
-                                  </svg>
-                                  <span>Cancel Order</span>
-                                </>
-                              )}
-                            </button>
-                          )}
-                          <p className="text-xs text-slate-500">
-                            Placed on{" "}
-                            <span className="font-medium">{orderDate}</span>
-                          </p>
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                      />
+                                    </svg>
+                                    <span>Cancel Order</span>
+                                  </>
+                                )}
+                              </button>
+                            )}
+                            <p className="text-[10px] md:text-xs text-slate-500 mt-1">
+                              Placed on{" "}
+                              <span className="font-medium">{orderDate}</span>
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
